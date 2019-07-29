@@ -1,4 +1,4 @@
-const { balance, BN, time } = require('openzeppelin-test-helpers');
+const { balance, BN, expectRevert, time } = require('openzeppelin-test-helpers');
 
 const { expect } = require('chai');
 
@@ -44,9 +44,41 @@ function shouldBehaveLikeFriendlyCrowdsale ([owner, wallet, investor, purchaser,
   context('should behave like FriendlyCrowdsale', function () {
     const value = new BN(1);
 
-    context('once started', function () {
+    beforeEach(async function () {
+      this.preWalletBalance = await balance.current(wallet);
+    });
+
+    context('before opening time', function () {
+      it('started should be false', async function () {
+        expect(await this.crowdsale.started()).to.be.equal(false);
+      });
+
+      it('ended should be false', async function () {
+        expect(await this.crowdsale.ended()).to.be.equal(false);
+      });
+
+      it('goalReached should be false', async function () {
+        expect(await this.crowdsale.goalReached()).to.be.equal(false);
+      });
+
+      it('denies refunds', async function () {
+        await expectRevert(this.crowdsale.claimRefund(investor),
+          'FriendlyCrowdsale: not finalized'
+        );
+      });
+    });
+
+    context('after opening time', function () {
       beforeEach(async function () {
         await time.increaseTo(this.openingTime);
+      });
+
+      it('started should be true', async function () {
+        expect(await this.crowdsale.started()).to.be.equal(true);
+      });
+
+      it('ended should be false', async function () {
+        expect(await this.crowdsale.ended()).to.be.equal(false);
       });
 
       describe('high-level purchase', function () {
@@ -63,6 +95,93 @@ function shouldBehaveLikeFriendlyCrowdsale ([owner, wallet, investor, purchaser,
           await this.crowdsale.buyTokens(investor, { value, from: purchaser });
           expect(await balanceTracker.delta()).to.be.bignumber.equal(value);
         });
+      });
+
+      it('denies refunds', async function () {
+        await expectRevert(this.crowdsale.claimRefund(investor),
+          'FriendlyCrowdsale: not finalized'
+        );
+      });
+
+      context('with unreached goal', function () {
+        beforeEach(async function () {
+          await this.crowdsale.sendTransaction({ value: this.lessThanGoal, from: investor });
+        });
+
+        it('ended should be false', async function () {
+          expect(await this.crowdsale.ended()).to.be.equal(false);
+        });
+
+        it('goalReached should be false', async function () {
+          expect(await this.crowdsale.goalReached()).to.be.equal(false);
+        });
+
+        context('after closing time and finalization', function () {
+          beforeEach(async function () {
+            await time.increaseTo(this.afterClosingTime);
+            await this.crowdsale.finalize({ from: other });
+          });
+
+          it('goalReached should be false', async function () {
+            expect(await this.crowdsale.goalReached()).to.be.equal(false);
+          });
+
+          it.skip('refunds', async function () {
+            const balanceTracker = await balance.tracker(investor);
+            await this.crowdsale.claimRefund(investor, { gasPrice: 0 });
+            expect(await balanceTracker.delta()).to.be.bignumber.equal(this.lessThanGoal);
+          });
+        });
+      });
+
+      context('with reached goal', function () {
+        beforeEach(async function () {
+          await this.crowdsale.sendTransaction({ value: this.goal, from: investor });
+        });
+
+        it('ended should be false', async function () {
+          expect(await this.crowdsale.ended()).to.be.equal(false);
+        });
+
+        it('goalReached should be true', async function () {
+          expect(await this.crowdsale.goalReached()).to.be.equal(true);
+        });
+
+        context('after closing time and finalization', function () {
+          beforeEach(async function () {
+            await time.increaseTo(this.afterClosingTime);
+            await this.crowdsale.finalize({ from: other });
+          });
+
+          it('ended should be true', async function () {
+            expect(await this.crowdsale.ended()).to.be.equal(true);
+          });
+
+          it('goalReached should be true', async function () {
+            expect(await this.crowdsale.goalReached()).to.be.equal(true);
+          });
+
+          it('denies refunds', async function () {
+            await expectRevert(this.crowdsale.claimRefund(investor),
+              'FriendlyCrowdsale: goal reached'
+            );
+          });
+
+          it.skip('forwards funds to wallet', async function () {
+            const postWalletBalance = await balance.current(wallet);
+            expect(postWalletBalance.sub(this.preWalletBalance)).to.be.bignumber.equal(this.goal);
+          });
+        });
+      });
+    });
+
+    context('after closing time', function () {
+      beforeEach(async function () {
+        await time.increaseTo(this.afterClosingTime);
+      });
+
+      it('ended should be true', async function () {
+        expect(await this.crowdsale.ended()).to.be.equal(true);
       });
     });
   });
