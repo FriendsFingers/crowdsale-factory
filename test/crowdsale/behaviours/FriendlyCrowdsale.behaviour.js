@@ -126,7 +126,7 @@ function shouldBehaveLikeFriendlyCrowdsale ([owner, wallet, investor, purchaser,
             expect(await this.crowdsale.goalReached()).to.be.equal(false);
           });
 
-          it.skip('refunds', async function () {
+          it('refunds', async function () {
             const balanceTracker = await balance.tracker(investor);
             await this.crowdsale.claimRefund(investor, { gasPrice: 0 });
             expect(await balanceTracker.delta()).to.be.bignumber.equal(this.lessThanGoal);
@@ -167,7 +167,7 @@ function shouldBehaveLikeFriendlyCrowdsale ([owner, wallet, investor, purchaser,
             );
           });
 
-          it.skip('forwards funds to wallet', async function () {
+          it('forwards funds to wallet', async function () {
             const postWalletBalance = await balance.current(wallet);
             expect(postWalletBalance.sub(this.preWalletBalance)).to.be.bignumber.equal(this.goal);
           });

@@ -3,7 +3,6 @@ pragma solidity ^0.5.10;
 import "openzeppelin-solidity/contracts/crowdsale/distribution/FinalizableCrowdsale.sol";
 import "openzeppelin-solidity/contracts/crowdsale/validation/CappedCrowdsale.sol";
 import "openzeppelin-solidity/contracts/crowdsale/validation/PausableCrowdsale.sol";
-import "../utils/Contributions.sol";
 
 /**
  * @title FriendlyCrowdsale
@@ -12,12 +11,22 @@ import "../utils/Contributions.sol";
  * allowing investors to purchase tokens with ether.
  */
 contract FriendlyCrowdsale is FinalizableCrowdsale, CappedCrowdsale, PausableCrowdsale {
+    enum State { Active, Refunding, Closed }
+
+    event RefundsClosed();
+    event RefundsEnabled();
+    event Withdrawn(address indexed refundee, uint256 weiAmount);
+
+    State private _state;
+
+    // list of addresses who contributed in crowdsales
+    address[] private _investors;
+
+    // map of contributors
+    mapping(address => uint256) private _deposits;
 
     // minimum amount of funds to be raised in weis
     uint256 private _goal;
-
-    // reference to Contributions contract
-    Contributions private _contributions;
 
     /**
      * @param openingTime Crowdsale opening time
@@ -27,7 +36,6 @@ contract FriendlyCrowdsale is FinalizableCrowdsale, CappedCrowdsale, PausableCro
      * @param rate Number of token units a buyer gets per wei
      * @param wallet Address where collected funds will be forwarded to
      * @param token Address of the token being sold
-     * @param contributions Address of the contributions contract
      */
     constructor(
         uint256 openingTime,
@@ -36,8 +44,7 @@ contract FriendlyCrowdsale is FinalizableCrowdsale, CappedCrowdsale, PausableCro
         uint256 goal,
         uint256 rate,
         address payable wallet,
-        IERC20 token,
-        address contributions
+        IERC20 token
     )
         public
         Crowdsale(rate, wallet, token)
@@ -47,10 +54,8 @@ contract FriendlyCrowdsale is FinalizableCrowdsale, CappedCrowdsale, PausableCro
         require(goal > 0, "FriendlyCrowdsale: goal is 0");
         require(goal <= cap, "FriendlyCrowdsale: goal is not less or equal cap");
 
-        require(contributions != address(0), "FriendlyCrowdsale: contributions is the zero address");
-
         _goal = goal;
-        _contributions = Contributions(contributions);
+        _state = State.Active;
     }
 
     /**
@@ -61,10 +66,10 @@ contract FriendlyCrowdsale is FinalizableCrowdsale, CappedCrowdsale, PausableCro
     }
 
     /**
-     * @return the crowdsale contributions contract address
+     * @return The current state of the escrow.
      */
-    function contributions() public view returns (Contributions) {
-        return _contributions;
+    function state() public view returns (State) {
+        return _state;
     }
 
     /**
@@ -90,15 +95,57 @@ contract FriendlyCrowdsale is FinalizableCrowdsale, CappedCrowdsale, PausableCro
     }
 
     /**
+     * @dev Return the investors length.
+     * @return uint representing investors number
+     */
+    function investorsNumber() public view returns (uint) {
+        return _investors.length;
+    }
+
+    /**
+     * @dev Check if a investor exists.
+     * @param account The address to check
+     * @return bool
+     */
+    function investorExists(address account) public view returns (bool) {
+        return weiContribution(account) > 0;
+    }
+
+    /**
+     * @dev Return the investors address by index.
+     * @param index A progressive index of investor addresses
+     * @return address of an investor by list index
+     */
+    function getInvestorAddress(uint index) public view returns (address) {
+        return _investors[index];
+    }
+
+    /**
+     * @dev get wei contribution for the given address
+     * @param account Address has contributed
+     * @return uint256
+     */
+    function weiContribution(address account) public view returns (uint256) {
+        return _deposits[account];
+    }
+
+    /**
      * @dev Investors can claim refunds here if crowdsale is unsuccessful.
      * @param refundee Whose refund will be claimed.
      */
     function claimRefund(address payable refundee) public {
         require(finalized(), "FriendlyCrowdsale: not finalized");
         require(!goalReached(), "FriendlyCrowdsale: goal reached");
+        require(_state == State.Refunding, "FriendlyCrowdsale: not Refunding");
+        require(investorExists(refundee), "FriendlyCrowdsale: no deposit");
 
-        // TODO
-        // _escrow.withdraw(refundee);
+        uint256 payment = _deposits[refundee];
+
+        _deposits[refundee] = 0;
+
+        refundee.transfer(payment);
+
+        emit Withdrawn(refundee, payment);
     }
 
     /**
@@ -106,23 +153,44 @@ contract FriendlyCrowdsale is FinalizableCrowdsale, CappedCrowdsale, PausableCro
      */
     function _finalization() internal {
         if (goalReached()) {
-            // TODO
-            // _escrow.close();
-            // _escrow.beneficiaryWithdraw();
+            _close();
+            wallet().transfer(address(this).balance);
         } else {
-            // TODO
-            // _escrow.enableRefunds();
+            _enableRefunds();
         }
-
-        super._finalization();
     }
 
     /**
-     * @dev Overrides Crowdsale fund forwarding, sending funds to escrow.
+     * @dev Overrides Crowdsale fund forwarding, keep funds here.
      */
     function _forwardFunds() internal {
-        // TODO
-        // does nothing
-        // _escrow.deposit.value(msg.value)(msg.sender);
+        address account = msg.sender;
+
+        if (!investorExists(account)) {
+            _investors.push(account);
+        }
+
+        _deposits[account] = _deposits[account].add(msg.value);
+    }
+
+    /**
+     * @dev Allows for the wallet to withdraw their funds, rejecting further deposits.
+     */
+    function _close() internal {
+        require(_state == State.Active, "FriendlyCrowdsale: can only close while active");
+        _state = State.Closed;
+
+        // TODO add fee percent
+
+        emit RefundsClosed();
+    }
+
+    /**
+     * @dev Allows for refunds to take place, rejecting further deposits.
+     */
+    function _enableRefunds() internal {
+        require(_state == State.Active, "FriendlyCrowdsale: can only enable refunds while active");
+        _state = State.Refunding;
+        emit RefundsEnabled();
     }
 }
