@@ -11,7 +11,7 @@ import "../utils/Contributions.sol";
  * @dev FriendlyCrowdsale is a base contract for managing a token crowdsale,
  * allowing investors to purchase tokens with ether.
  */
-contract FriendlyCrowdsale is FinalizableCrowdsale, CappedCrowdsale, PausableCrowdsale, TokenRecover {
+contract FriendlyCrowdsale is FinalizableCrowdsale, CappedCrowdsale, PausableCrowdsale {
 
     // minimum amount of funds to be raised in weis
     uint256 private _goal;
@@ -122,6 +122,7 @@ contract FriendlyCrowdsale is FinalizableCrowdsale, CappedCrowdsale, PausableCro
      */
     function _forwardFunds() internal {
         // TODO
+        // does nothing
         // _escrow.deposit.value(msg.value)(msg.sender);
     }
 }
