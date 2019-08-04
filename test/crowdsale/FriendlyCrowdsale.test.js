@@ -27,6 +27,12 @@ contract('FriendlyCrowdsale', function ([owner, wallet, investor, purchaser, oth
 
     this.maxTokenSupply = this.cap.mul(this.rate);
 
+    this.escrowState = {
+      active: new BN(0),
+      refunding: new BN(1),
+      closed: new BN(2),
+    };
+
     this.token = await ERC20Mock.new(owner, this.maxTokenSupply, { from: owner });
   });
 

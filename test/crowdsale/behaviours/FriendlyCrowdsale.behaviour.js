@@ -49,6 +49,10 @@ function shouldBehaveLikeFriendlyCrowdsale ([owner, wallet, investor, purchaser,
     });
 
     context('before opening time', function () {
+      it('state should be active', async function () {
+        expect(await this.crowdsale.state()).to.be.bignumber.equal(this.escrowState.active);
+      });
+
       it('started should be false', async function () {
         expect(await this.crowdsale.started()).to.be.equal(false);
       });
@@ -122,6 +126,10 @@ function shouldBehaveLikeFriendlyCrowdsale ([owner, wallet, investor, purchaser,
             await this.crowdsale.finalize({ from: other });
           });
 
+          it('state should be refunding', async function () {
+            expect(await this.crowdsale.state()).to.be.bignumber.equal(this.escrowState.refunding);
+          });
+
           it('goalReached should be false', async function () {
             expect(await this.crowdsale.goalReached()).to.be.equal(false);
           });
@@ -151,6 +159,10 @@ function shouldBehaveLikeFriendlyCrowdsale ([owner, wallet, investor, purchaser,
           beforeEach(async function () {
             await time.increaseTo(this.afterClosingTime);
             await this.crowdsale.finalize({ from: other });
+          });
+
+          it('state should be closed', async function () {
+            expect(await this.crowdsale.state()).to.be.bignumber.equal(this.escrowState.closed);
           });
 
           it('ended should be true', async function () {
