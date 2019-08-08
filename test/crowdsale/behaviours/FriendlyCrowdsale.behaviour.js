@@ -96,6 +96,31 @@ function shouldBehaveLikeFriendlyCrowdsale ([owner, wallet, investor, purchaser,
           expect(await balanceTracker.delta()).to.be.bignumber.equal(value);
         });
 
+        it('should increase investors number', async function () {
+          const investorsNumber = await this.crowdsale.investorsNumber();
+
+          await this.crowdsale.sendTransaction({ value, from: purchaser });
+          await this.crowdsale.sendTransaction({ value, from: investor });
+
+          expect(await this.crowdsale.investorsNumber()).to.be.bignumber.equal(investorsNumber.addn(2));
+        });
+
+        it('should get investors address by index', async function () {
+          await this.crowdsale.sendTransaction({ value, from: purchaser });
+          await this.crowdsale.sendTransaction({ value, from: investor });
+
+          expect(await this.crowdsale.getInvestorAddress(0)).to.be.equal(purchaser);
+          expect(await this.crowdsale.getInvestorAddress(1)).to.be.equal(investor);
+        });
+
+        it('should increase wei contributions', async function () {
+          await this.crowdsale.sendTransaction({ value, from: purchaser });
+          await this.crowdsale.sendTransaction({ value, from: investor });
+
+          expect(await this.crowdsale.weiContribution(purchaser)).to.be.bignumber.equal(value);
+          expect(await this.crowdsale.weiContribution(investor)).to.be.bignumber.equal(value);
+        });
+
         it('should increase escrow deposit', async function () {
           const balanceTracker = await balance.tracker(this.crowdsale.address);
           await this.crowdsale.sendTransaction({ value, from: investor });
@@ -113,6 +138,31 @@ function shouldBehaveLikeFriendlyCrowdsale ([owner, wallet, investor, purchaser,
           const balanceTracker = await balance.tracker(this.crowdsale.address);
           await this.crowdsale.buyTokens(investor, { value, from: purchaser });
           expect(await balanceTracker.delta()).to.be.bignumber.equal(value);
+        });
+
+        it('should increase investors number', async function () {
+          const investorsNumber = await this.crowdsale.investorsNumber();
+
+          await this.crowdsale.buyTokens(purchaser, { value, from: purchaser });
+          await this.crowdsale.buyTokens(investor, { value, from: purchaser });
+
+          expect(await this.crowdsale.investorsNumber()).to.be.bignumber.equal(investorsNumber.addn(2));
+        });
+
+        it('should get investors address by index', async function () {
+          await this.crowdsale.buyTokens(purchaser, { value, from: purchaser });
+          await this.crowdsale.buyTokens(investor, { value, from: purchaser });
+
+          expect(await this.crowdsale.getInvestorAddress(0)).to.be.equal(purchaser);
+          expect(await this.crowdsale.getInvestorAddress(1)).to.be.equal(investor);
+        });
+
+        it('should increase wei contributions', async function () {
+          await this.crowdsale.buyTokens(purchaser, { value, from: purchaser });
+          await this.crowdsale.buyTokens(investor, { value, from: purchaser });
+
+          expect(await this.crowdsale.weiContribution(purchaser)).to.be.bignumber.equal(value);
+          expect(await this.crowdsale.weiContribution(investor)).to.be.bignumber.equal(value);
         });
 
         it('should increase escrow deposit', async function () {
@@ -173,6 +223,19 @@ function shouldBehaveLikeFriendlyCrowdsale ([owner, wallet, investor, purchaser,
             await this.crowdsale.claimRefund(investor, { gasPrice: 0 });
             expect(await balanceTracker.delta()).to.be.bignumber.equal(this.lessThanGoal);
           });
+
+          it('denies refunds twice', async function () {
+            await this.crowdsale.claimRefund(investor, { gasPrice: 0 });
+            await expectRevert(this.crowdsale.claimRefund(investor),
+              'FriendlyCrowdsale: no deposit'
+            );
+          });
+
+          it('denies refunds if not investor', async function () {
+            await expectRevert(this.crowdsale.claimRefund(purchaser),
+              'FriendlyCrowdsale: no deposit'
+            );
+          });
         });
       });
 
@@ -217,7 +280,7 @@ function shouldBehaveLikeFriendlyCrowdsale ([owner, wallet, investor, purchaser,
 
           it('denies refunds', async function () {
             await expectRevert(this.crowdsale.claimRefund(investor),
-              'FriendlyCrowdsale: goal reached'
+              'FriendlyCrowdsale: not refunding'
             );
           });
 

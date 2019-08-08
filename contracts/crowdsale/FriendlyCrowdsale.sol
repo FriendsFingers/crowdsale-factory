@@ -140,7 +140,6 @@ contract FriendlyCrowdsale is FinalizableCrowdsale, CappedCrowdsale, PausableCro
      */
     function claimRefund(address payable refundee) public {
         require(finalized(), "FriendlyCrowdsale: not finalized");
-        require(!goalReached(), "FriendlyCrowdsale: goal reached");
         require(_state == State.Refunding, "FriendlyCrowdsale: not refunding");
         require(weiContribution(refundee) > 0, "FriendlyCrowdsale: no deposit");
 
