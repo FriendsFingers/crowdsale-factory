@@ -13,6 +13,11 @@ import "openzeppelin-solidity/contracts/crowdsale/validation/PausableCrowdsale.s
 contract FriendlyCrowdsale is FinalizableCrowdsale, CappedCrowdsale, PausableCrowdsale {
     enum State { Active, Refunding, Closed }
 
+    struct Escrow {
+        bool exists;
+        uint256 deposit;
+    }
+
     event RefundsClosed();
     event RefundsEnabled();
     event Withdrawn(address indexed refundee, uint256 weiAmount);
@@ -22,8 +27,8 @@ contract FriendlyCrowdsale is FinalizableCrowdsale, CappedCrowdsale, PausableCro
     // list of addresses who contributed in crowdsales
     address[] private _investors;
 
-    // map of contributors
-    mapping(address => uint256) private _deposits;
+    // map of investors
+    mapping(address => Escrow) private _escrowList;
 
     // minimum amount of funds to be raised in weis
     uint256 private _goal;
@@ -108,7 +113,7 @@ contract FriendlyCrowdsale is FinalizableCrowdsale, CappedCrowdsale, PausableCro
      * @return bool
      */
     function investorExists(address account) public view returns (bool) {
-        return weiContribution(account) > 0;
+        return _escrowList[account].exists;
     }
 
     /**
@@ -126,7 +131,7 @@ contract FriendlyCrowdsale is FinalizableCrowdsale, CappedCrowdsale, PausableCro
      * @return uint256
      */
     function weiContribution(address account) public view returns (uint256) {
-        return _deposits[account];
+        return _escrowList[account].deposit;
     }
 
     /**
@@ -136,16 +141,29 @@ contract FriendlyCrowdsale is FinalizableCrowdsale, CappedCrowdsale, PausableCro
     function claimRefund(address payable refundee) public {
         require(finalized(), "FriendlyCrowdsale: not finalized");
         require(!goalReached(), "FriendlyCrowdsale: goal reached");
-        require(_state == State.Refunding, "FriendlyCrowdsale: not Refunding");
-        require(investorExists(refundee), "FriendlyCrowdsale: no deposit");
+        require(_state == State.Refunding, "FriendlyCrowdsale: not refunding");
+        require(weiContribution(refundee) > 0, "FriendlyCrowdsale: no deposit");
 
-        uint256 payment = _deposits[refundee];
+        uint256 payment = _escrowList[refundee].deposit;
 
-        _deposits[refundee] = 0;
+        _escrowList[refundee].deposit = 0;
 
         refundee.transfer(payment);
 
         emit Withdrawn(refundee, payment);
+    }
+
+    /**
+     * @param beneficiary Address receiving the tokens
+     * @param weiAmount Value in wei involved in the purchase
+     */
+    function _updatePurchasingState(address beneficiary, uint256 weiAmount) internal {
+        if (!investorExists(beneficiary)) {
+            _investors.push(beneficiary);
+            _escrowList[beneficiary].exists = true;
+        }
+
+        _escrowList[beneficiary].deposit = _escrowList[beneficiary].deposit.add(weiAmount);
     }
 
     /**
@@ -154,7 +172,6 @@ contract FriendlyCrowdsale is FinalizableCrowdsale, CappedCrowdsale, PausableCro
     function _finalization() internal {
         if (goalReached()) {
             _close();
-            wallet().transfer(address(this).balance);
         } else {
             _enableRefunds();
         }
@@ -164,32 +181,28 @@ contract FriendlyCrowdsale is FinalizableCrowdsale, CappedCrowdsale, PausableCro
      * @dev Overrides Crowdsale fund forwarding, keep funds here.
      */
     function _forwardFunds() internal {
-        address account = msg.sender;
+        // solhint-disable-previous-line no-empty-blocks
 
-        if (!investorExists(account)) {
-            _investors.push(account);
-        }
-
-        _deposits[account] = _deposits[account].add(msg.value);
+        // does nothing, keep funds on this contract
     }
 
     /**
-     * @dev Allows for the wallet to withdraw their funds, rejecting further deposits.
+     * @dev Allows for the wallet to withdraw their funds.
      */
     function _close() internal {
-        require(_state == State.Active, "FriendlyCrowdsale: can only close while active");
         _state = State.Closed;
 
         // TODO add fee percent
+
+        wallet().transfer(address(this).balance);
 
         emit RefundsClosed();
     }
 
     /**
-     * @dev Allows for refunds to take place, rejecting further deposits.
+     * @dev Allows for refunds to take place.
      */
     function _enableRefunds() internal {
-        require(_state == State.Active, "FriendlyCrowdsale: can only enable refunds while active");
         _state = State.Refunding;
         emit RefundsEnabled();
     }

@@ -1,4 +1,4 @@
-const { balance, BN, expectRevert, time } = require('openzeppelin-test-helpers');
+const { balance, BN, expectEvent, expectRevert, time } = require('openzeppelin-test-helpers');
 
 const { expect } = require('chai');
 
@@ -48,6 +48,10 @@ function shouldBehaveLikeFriendlyCrowdsale ([owner, wallet, investor, purchaser,
       this.preWalletBalance = await balance.current(wallet);
     });
 
+    it('investor does not exist', async function () {
+      expect(await this.crowdsale.investorExists(investor)).to.be.equal(false);
+    });
+
     context('before opening time', function () {
       it('state should be active', async function () {
         expect(await this.crowdsale.state()).to.be.bignumber.equal(this.escrowState.active);
@@ -91,6 +95,17 @@ function shouldBehaveLikeFriendlyCrowdsale ([owner, wallet, investor, purchaser,
           await this.crowdsale.sendTransaction({ value, from: investor });
           expect(await balanceTracker.delta()).to.be.bignumber.equal(value);
         });
+
+        it('should increase escrow deposit', async function () {
+          const balanceTracker = await balance.tracker(this.crowdsale.address);
+          await this.crowdsale.sendTransaction({ value, from: investor });
+          expect(await balanceTracker.delta()).to.be.bignumber.equal(await this.crowdsale.weiContribution(investor));
+        });
+
+        it('investor exists', async function () {
+          await this.crowdsale.sendTransaction({ value, from: investor });
+          expect(await this.crowdsale.investorExists(investor)).to.be.equal(true);
+        });
       });
 
       describe('low-level purchase', function () {
@@ -98,6 +113,17 @@ function shouldBehaveLikeFriendlyCrowdsale ([owner, wallet, investor, purchaser,
           const balanceTracker = await balance.tracker(this.crowdsale.address);
           await this.crowdsale.buyTokens(investor, { value, from: purchaser });
           expect(await balanceTracker.delta()).to.be.bignumber.equal(value);
+        });
+
+        it('should increase escrow deposit', async function () {
+          const balanceTracker = await balance.tracker(this.crowdsale.address);
+          await this.crowdsale.buyTokens(investor, { value, from: purchaser });
+          expect(await balanceTracker.delta()).to.be.bignumber.equal(await this.crowdsale.weiContribution(investor));
+        });
+
+        it('investor exists', async function () {
+          await this.crowdsale.buyTokens(investor, { value, from: purchaser });
+          expect(await this.crowdsale.investorExists(investor)).to.be.equal(true);
         });
       });
 
@@ -118,6 +144,14 @@ function shouldBehaveLikeFriendlyCrowdsale ([owner, wallet, investor, purchaser,
 
         it('goalReached should be false', async function () {
           expect(await this.crowdsale.goalReached()).to.be.equal(false);
+        });
+
+        context('finalizing', function () {
+          it('emits a RefundsEnabled event', async function () {
+            await time.increaseTo(this.afterClosingTime);
+            const { logs } = await this.crowdsale.finalize({ from: other });
+            expectEvent.inLogs(logs, 'RefundsEnabled');
+          });
         });
 
         context('after closing time and finalization', function () {
@@ -153,6 +187,14 @@ function shouldBehaveLikeFriendlyCrowdsale ([owner, wallet, investor, purchaser,
 
         it('goalReached should be true', async function () {
           expect(await this.crowdsale.goalReached()).to.be.equal(true);
+        });
+
+        context('finalizing', function () {
+          it('emits a RefundsClosed event', async function () {
+            await time.increaseTo(this.afterClosingTime);
+            const { logs } = await this.crowdsale.finalize({ from: other });
+            expectEvent.inLogs(logs, 'RefundsClosed');
+          });
         });
 
         context('after closing time and finalization', function () {
