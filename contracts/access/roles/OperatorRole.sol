@@ -15,7 +15,7 @@ contract OperatorRole {
     }
 
     modifier onlyOperator() {
-        require(isOperator(msg.sender));
+        require(isOperator(msg.sender), "OperatorRole: caller does not have the Operator role");
         _;
     }
 

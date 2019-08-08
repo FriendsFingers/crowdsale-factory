@@ -3,6 +3,7 @@ pragma solidity ^0.5.10;
 import "openzeppelin-solidity/contracts/crowdsale/distribution/FinalizableCrowdsale.sol";
 import "openzeppelin-solidity/contracts/crowdsale/validation/CappedCrowdsale.sol";
 import "openzeppelin-solidity/contracts/crowdsale/validation/PausableCrowdsale.sol";
+import "../access/roles/OperatorRole.sol";
 
 /**
  * @title FriendlyCrowdsale
@@ -10,8 +11,8 @@ import "openzeppelin-solidity/contracts/crowdsale/validation/PausableCrowdsale.s
  * @dev FriendlyCrowdsale is a base contract for managing a token crowdsale,
  * allowing investors to purchase tokens with ether.
  */
-contract FriendlyCrowdsale is FinalizableCrowdsale, CappedCrowdsale, PausableCrowdsale {
-    enum State { Active, Refunding, Closed }
+contract FriendlyCrowdsale is FinalizableCrowdsale, CappedCrowdsale, PausableCrowdsale, OperatorRole {
+    enum State { Active, Refunding, Closed, Expired }
 
     struct Escrow {
         bool exists;
@@ -20,9 +21,13 @@ contract FriendlyCrowdsale is FinalizableCrowdsale, CappedCrowdsale, PausableCro
 
     event RefundsClosed();
     event RefundsEnabled();
+    event Expired();
     event Withdrawn(address indexed refundee, uint256 weiAmount);
 
     State private _state;
+
+    // Address where fee are collected
+    address payable private _feeWallet;
 
     // list of addresses who contributed in crowdsales
     address[] private _investors;
@@ -49,7 +54,8 @@ contract FriendlyCrowdsale is FinalizableCrowdsale, CappedCrowdsale, PausableCro
         uint256 goal,
         uint256 rate,
         address payable wallet,
-        IERC20 token
+        IERC20 token,
+        address payable feeWallet
     )
         public
         Crowdsale(rate, wallet, token)
@@ -58,9 +64,19 @@ contract FriendlyCrowdsale is FinalizableCrowdsale, CappedCrowdsale, PausableCro
     {
         require(goal > 0, "FriendlyCrowdsale: goal is 0");
         require(goal <= cap, "FriendlyCrowdsale: goal is not less or equal cap");
+        require(feeWallet != address(0), "FriendlyCrowdsale: feeWallet is the zero address");
 
         _goal = goal;
+        _feeWallet = feeWallet;
+
         _state = State.Active;
+    }
+
+    /**
+     * @return address where fee are collected.
+     */
+    function feeWallet() public view returns (address) {
+        return _feeWallet;
     }
 
     /**
@@ -150,6 +166,16 @@ contract FriendlyCrowdsale is FinalizableCrowdsale, CappedCrowdsale, PausableCro
         refundee.transfer(payment);
 
         emit Withdrawn(refundee, payment);
+    }
+
+    function setExpiredAndWithdraw() public onlyOperator {
+        // solhint-disable-next-line not-rely-on-time
+        require(block.timestamp >= closingTime() + 365 days, "FriendlyCrowdsale: not expired");
+        _state = State.Expired;
+
+        _feeWallet.transfer(address(this).balance);
+
+        emit Expired();
     }
 
     /**

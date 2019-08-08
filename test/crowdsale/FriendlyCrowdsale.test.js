@@ -6,7 +6,7 @@ const { shouldBehaveLikeFriendlyCrowdsale } = require('./behaviours/FriendlyCrow
 const FriendlyCrowdsale = artifacts.require('FriendlyCrowdsale');
 const ERC20Mock = artifacts.require('ERC20Mock');
 
-contract('FriendlyCrowdsale', function ([owner, wallet, investor, purchaser, other]) {
+contract('FriendlyCrowdsale', function ([owner, wallet, investor, purchaser, feeWallet, other]) {
   before(async function () {
     // Advance to the next block to correctly read time in the solidity "now" function interpreted by ganache
     await time.advanceBlock();
@@ -31,6 +31,7 @@ contract('FriendlyCrowdsale', function ([owner, wallet, investor, purchaser, oth
       active: new BN(0),
       refunding: new BN(1),
       closed: new BN(2),
+      expired: new BN(3),
     };
 
     this.token = await ERC20Mock.new(owner, this.maxTokenSupply, { from: owner });
@@ -46,7 +47,8 @@ contract('FriendlyCrowdsale', function ([owner, wallet, investor, purchaser, oth
           this.goal,
           0,
           wallet,
-          this.token.address
+          this.token.address,
+          feeWallet
         ),
         'Crowdsale: rate is 0'
       );
@@ -61,7 +63,8 @@ contract('FriendlyCrowdsale', function ([owner, wallet, investor, purchaser, oth
           this.goal,
           this.rate,
           ZERO_ADDRESS,
-          this.token.address
+          this.token.address,
+          feeWallet
         ),
         'Crowdsale: wallet is the zero address'
       );
@@ -76,9 +79,26 @@ contract('FriendlyCrowdsale', function ([owner, wallet, investor, purchaser, oth
           this.goal,
           this.rate,
           wallet,
-          ZERO_ADDRESS
+          ZERO_ADDRESS,
+          feeWallet
         ),
         'Crowdsale: token is the zero address'
+      );
+    });
+
+    it('requires a non-null feeWallet', async function () {
+      await expectRevert(
+        FriendlyCrowdsale.new(
+          this.openingTime,
+          this.closingTime,
+          this.cap,
+          this.goal,
+          this.rate,
+          wallet,
+          this.token.address,
+          ZERO_ADDRESS
+        ),
+        'FriendlyCrowdsale: feeWallet is the zero address'
       );
     });
 
@@ -91,7 +111,8 @@ contract('FriendlyCrowdsale', function ([owner, wallet, investor, purchaser, oth
           this.goal,
           this.rate,
           wallet,
-          this.token.address
+          this.token.address,
+          feeWallet
         ),
         'TimedCrowdsale: opening time is before current time'
       );
@@ -106,7 +127,8 @@ contract('FriendlyCrowdsale', function ([owner, wallet, investor, purchaser, oth
           this.goal,
           this.rate,
           wallet,
-          this.token.address
+          this.token.address,
+          feeWallet
         ),
         'TimedCrowdsale: opening time is not before closing time'
       );
@@ -121,7 +143,8 @@ contract('FriendlyCrowdsale', function ([owner, wallet, investor, purchaser, oth
           this.goal,
           this.rate,
           wallet,
-          this.token.address
+          this.token.address,
+          feeWallet
         ),
         'TimedCrowdsale: opening time is not before closing time'
       );
@@ -136,7 +159,8 @@ contract('FriendlyCrowdsale', function ([owner, wallet, investor, purchaser, oth
           this.goal,
           this.rate,
           wallet,
-          this.token.address
+          this.token.address,
+          feeWallet
         ),
         'CappedCrowdsale: cap is 0'
       );
@@ -151,7 +175,8 @@ contract('FriendlyCrowdsale', function ([owner, wallet, investor, purchaser, oth
           0,
           this.rate,
           wallet,
-          this.token.address
+          this.token.address,
+          feeWallet
         ),
         'FriendlyCrowdsale: goal is 0'
       );
@@ -166,7 +191,8 @@ contract('FriendlyCrowdsale', function ([owner, wallet, investor, purchaser, oth
           this.cap.addn(1),
           this.rate,
           wallet,
-          this.token.address
+          this.token.address,
+          feeWallet
         ),
         'FriendlyCrowdsale: goal is not less or equal cap'
       );
@@ -182,6 +208,7 @@ contract('FriendlyCrowdsale', function ([owner, wallet, investor, purchaser, oth
           this.rate,
           wallet,
           this.token.address,
+          feeWallet,
           { from: owner }
         );
 
@@ -216,8 +243,12 @@ contract('FriendlyCrowdsale', function ([owner, wallet, investor, purchaser, oth
         (await this.crowdsale.token()).should.be.equal(this.token.address);
       });
 
+      it('feeWallet should be right set', async function () {
+        (await this.crowdsale.feeWallet()).should.be.equal(feeWallet);
+      });
+
       context('test FriendlyCrowdale behavior', function () {
-        shouldBehaveLikeFriendlyCrowdsale([owner, wallet, investor, purchaser, other]);
+        shouldBehaveLikeFriendlyCrowdsale([owner, wallet, investor, purchaser, feeWallet, other]);
       });
     });
   });

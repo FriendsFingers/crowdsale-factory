@@ -8,7 +8,7 @@ const { shouldBehaveLikeTimedCrowdsale } = require('./TimedCrowdsale.behavior');
 const { shouldBehaveLikeFinalizableCrowdsale } = require('./FinalizableCrowdsale.behavior');
 const { shouldBehaveLikeCrowdsale } = require('./Crowdsale.behavior');
 
-function shouldBehaveLikeFriendlyCrowdsale ([owner, wallet, investor, purchaser, other]) {
+function shouldBehaveLikeFriendlyCrowdsale ([owner, wallet, investor, purchaser, feeWallet, other]) {
   context('should behave like PausableCrowdsale', function () {
     beforeEach(async function () {
       await time.increaseTo(this.openingTime);
@@ -299,6 +299,39 @@ function shouldBehaveLikeFriendlyCrowdsale ([owner, wallet, investor, purchaser,
 
       it('ended should be true', async function () {
         expect(await this.crowdsale.ended()).to.be.equal(true);
+      });
+
+      it('denies setting expired and withdraw', async function () {
+        await expectRevert(this.crowdsale.setExpiredAndWithdraw({ from: owner }),
+          'FriendlyCrowdsale: not expired'
+        );
+      });
+    });
+
+    context('a year after closing time', function () {
+      beforeEach(async function () {
+        await time.increaseTo(this.openingTime);
+        await this.crowdsale.sendTransaction({ value: this.lessThanGoal, from: investor });
+        await time.increaseTo(this.closingTime.add(time.duration.days(365)));
+      });
+
+      it('denies other account setting expired and withdraw', async function () {
+        await expectRevert(this.crowdsale.setExpiredAndWithdraw({ from: other }),
+          'OperatorRole: caller does not have the Operator role'
+        );
+      });
+
+      it('emits a Expired event', async function () {
+        const { logs } = await this.crowdsale.setExpiredAndWithdraw({ from: owner });
+        expectEvent.inLogs(logs, 'Expired');
+      });
+
+      it('allow operator setting expired and withdraw', async function () {
+        const preWalletBalance = await balance.current(feeWallet);
+        await this.crowdsale.setExpiredAndWithdraw({ from: owner });
+
+        const postWalletBalance = await balance.current(feeWallet);
+        expect(postWalletBalance.sub(preWalletBalance)).to.be.bignumber.equal(this.lessThanGoal);
       });
     });
   });
