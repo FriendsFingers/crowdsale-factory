@@ -2,7 +2,6 @@ pragma solidity ^0.5.10;
 
 import "openzeppelin-solidity/contracts/crowdsale/distribution/FinalizableCrowdsale.sol";
 import "openzeppelin-solidity/contracts/crowdsale/validation/CappedCrowdsale.sol";
-import "openzeppelin-solidity/contracts/crowdsale/validation/PausableCrowdsale.sol";
 import "../access/roles/OperatorRole.sol";
 
 /**
@@ -11,14 +10,15 @@ import "../access/roles/OperatorRole.sol";
  * @dev FriendlyCrowdsale is a base contract for managing a token crowdsale,
  * allowing investors to purchase tokens with ether.
  */
-contract FriendlyCrowdsale is FinalizableCrowdsale, CappedCrowdsale, PausableCrowdsale, OperatorRole {
-    enum State { Active, Refunding, Closed, Expired }
+contract FriendlyCrowdsale is FinalizableCrowdsale, CappedCrowdsale, OperatorRole {
+    enum State { Review, Active, Refunding, Closed, Expired }
 
     struct Escrow {
         bool exists;
         uint256 deposit;
     }
 
+    event Enabled();
     event RefundsClosed();
     event RefundsEnabled();
     event Expired();
@@ -69,7 +69,7 @@ contract FriendlyCrowdsale is FinalizableCrowdsale, CappedCrowdsale, PausableCro
         _goal = goal;
         _feeWallet = feeWallet;
 
-        _state = State.Active;
+        _state = State.Review;
     }
 
     /**
@@ -151,6 +151,16 @@ contract FriendlyCrowdsale is FinalizableCrowdsale, CappedCrowdsale, PausableCro
     }
 
     /**
+     * @dev Enable the crowdsale
+     */
+    function enable() public onlyOperator {
+        require(_state == State.Review, "FriendlyCrowdsale: not reviewing");
+        _state = State.Active;
+
+        emit Enabled();
+    }
+
+    /**
      * @dev Investors can claim refunds here if crowdsale is unsuccessful.
      * @param refundee Whose refund will be claimed.
      */
@@ -176,6 +186,18 @@ contract FriendlyCrowdsale is FinalizableCrowdsale, CappedCrowdsale, PausableCro
         _feeWallet.transfer(address(this).balance);
 
         emit Expired();
+    }
+
+    /**
+     * @dev Validation of an incoming purchase.
+     * Adds the validation that the crowdsale must be active.
+     * @param _beneficiary Address performing the token purchase
+     * @param _weiAmount Value in wei involved in the purchase
+     */
+    function _preValidatePurchase(address _beneficiary, uint256 _weiAmount) internal view {
+        require(_state == State.Active, "FriendlyCrowdsale: not active");
+
+        return super._preValidatePurchase(_beneficiary, _weiAmount);
     }
 
     /**
