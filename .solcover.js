@@ -6,7 +6,7 @@ module.exports = {
         'eth-token-recover',
         'erc-payable-token',
         'dao-smartcontracts',
-        'openzeppelin-solidity',
+        '@openzeppelin/contracts',
     ],
     skipFiles: [
         'mocks'

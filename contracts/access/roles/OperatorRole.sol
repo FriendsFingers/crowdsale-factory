@@ -1,6 +1,6 @@
-pragma solidity ^0.5.10;
+pragma solidity ^0.5.11;
 
-import "openzeppelin-solidity/contracts/access/Roles.sol";
+import "@openzeppelin/contracts/access/Roles.sol";
 
 contract OperatorRole {
     using Roles for Roles.Role;
