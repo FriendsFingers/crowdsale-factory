@@ -16,7 +16,7 @@ The FriendsFingers' Crowdsale Factory Smart Contracts
 npm install
 ```
 
-## Usage
+### Usage (using Truffle)
 
 Open the Truffle console
 
@@ -24,16 +24,36 @@ Open the Truffle console
 npm run console
 ```
 
-### Compile
+#### Compile
 
 ```bash
 npm run compile
 ```
 
-### Test 
+#### Test 
 
 ```bash
 npm run test 
+```
+
+### Usage (using Buidler)
+
+Open the Buidler console
+
+```bash
+npm run buidler:console
+```
+
+#### Compile
+
+```bash
+npm run buidler:compile
+```
+
+#### Test 
+
+```bash
+npm run buidler:test 
 ```
 
 ### Code Coverage
@@ -104,6 +124,8 @@ The `inheritance` command outputs a DOT-formatted graph of the inheritance tree.
 The `graph` command outputs a DOT-formatted graph of the control flow.
 
 The `mdreport` command creates a markdown description report with tables comprising information about the system's files, contracts and their functions.
+
+The `sol2uml` generates UML class diagram from Solidity contracts.
 
 ## License
 
