@@ -1,4 +1,4 @@
-const { BN, constants, expectEvent, expectRevert } = require('openzeppelin-test-helpers');
+const { BN, constants, expectEvent, expectRevert } = require('@openzeppelin/test-helpers');
 const { ZERO_ADDRESS } = constants;
 
 const { expect } = require('chai');
@@ -18,7 +18,7 @@ function shouldBehaveLikeCrowdsale ([investor, wallet, purchaser]) {
 
       it('reverts on zero-valued payments', async function () {
         await expectRevert(
-          this.crowdsale.send(0, { from: purchaser }), 'Crowdsale: weiAmount is 0'
+          this.crowdsale.send(0, { from: purchaser }), 'Crowdsale: weiAmount is 0',
         );
       });
     });
@@ -30,14 +30,14 @@ function shouldBehaveLikeCrowdsale ([investor, wallet, purchaser]) {
 
       it('reverts on zero-valued payments', async function () {
         await expectRevert(
-          this.crowdsale.buyTokens(investor, { value: 0, from: purchaser }), 'Crowdsale: weiAmount is 0'
+          this.crowdsale.buyTokens(investor, { value: 0, from: purchaser }), 'Crowdsale: weiAmount is 0',
         );
       });
 
       it('requires a non-null beneficiary', async function () {
         await expectRevert(
           this.crowdsale.buyTokens(ZERO_ADDRESS, { value: value, from: purchaser }),
-          'Crowdsale: beneficiary is the zero address'
+          'Crowdsale: beneficiary is the zero address',
         );
       });
     });

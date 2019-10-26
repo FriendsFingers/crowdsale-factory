@@ -1,4 +1,4 @@
-const { BN, expectRevert, time } = require('openzeppelin-test-helpers');
+const { BN, expectRevert, time } = require('@openzeppelin/test-helpers');
 
 function shouldBehaveLikeTimedCrowdsale ([investor, purchaser]) {
   const value = new BN(1);
@@ -15,7 +15,7 @@ function shouldBehaveLikeTimedCrowdsale ([investor, purchaser]) {
       expect(await this.crowdsale.isOpen()).to.equal(false);
       await expectRevert(this.crowdsale.send(value), 'TimedCrowdsale: not open');
       await expectRevert(this.crowdsale.buyTokens(investor, { from: purchaser, value: value }),
-        'TimedCrowdsale: not open'
+        'TimedCrowdsale: not open',
       );
     });
 
@@ -30,7 +30,7 @@ function shouldBehaveLikeTimedCrowdsale ([investor, purchaser]) {
       await time.increaseTo(this.afterClosingTime);
       await expectRevert(this.crowdsale.send(value), 'TimedCrowdsale: not open');
       await expectRevert(this.crowdsale.buyTokens(investor, { value: value, from: purchaser }),
-        'TimedCrowdsale: not open'
+        'TimedCrowdsale: not open',
       );
     });
   });

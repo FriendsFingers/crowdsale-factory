@@ -1,4 +1,4 @@
-const { expectRevert } = require('openzeppelin-test-helpers');
+const { expectRevert } = require('@openzeppelin/test-helpers');
 
 function shouldBehaveLikeCappedCrowdsale () {
   describe('accepting payments', function () {

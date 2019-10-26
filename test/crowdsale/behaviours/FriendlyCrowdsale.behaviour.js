@@ -1,4 +1,4 @@
-const { balance, BN, expectEvent, expectRevert, time } = require('openzeppelin-test-helpers');
+const { balance, BN, expectEvent, expectRevert, time } = require('@openzeppelin/test-helpers');
 
 const { expect } = require('chai');
 
@@ -66,7 +66,7 @@ function shouldBehaveLikeFriendlyCrowdsale ([owner, wallet, investor, purchaser,
 
     it('disallow other to enable crowdsale', async function () {
       await expectRevert(this.crowdsale.enable({ from: other }),
-        'OperatorRole: caller does not have the Operator role'
+        'OperatorRole: caller does not have the Operator role',
       );
     });
 
@@ -88,7 +88,7 @@ function shouldBehaveLikeFriendlyCrowdsale ([owner, wallet, investor, purchaser,
 
       it('disallow to be enabled twice', async function () {
         await expectRevert(this.crowdsale.enable({ from: owner }),
-          'FriendlyCrowdsale: not reviewing'
+          'FriendlyCrowdsale: not reviewing',
         );
       });
 
@@ -107,7 +107,7 @@ function shouldBehaveLikeFriendlyCrowdsale ([owner, wallet, investor, purchaser,
 
         it('denies refunds', async function () {
           await expectRevert(this.crowdsale.claimRefund(investor),
-            'FriendlyCrowdsale: not finalized'
+            'FriendlyCrowdsale: not finalized',
           );
         });
       });
@@ -215,7 +215,7 @@ function shouldBehaveLikeFriendlyCrowdsale ([owner, wallet, investor, purchaser,
 
         it('denies refunds', async function () {
           await expectRevert(this.crowdsale.claimRefund(investor),
-            'FriendlyCrowdsale: not finalized'
+            'FriendlyCrowdsale: not finalized',
           );
         });
 
@@ -263,13 +263,13 @@ function shouldBehaveLikeFriendlyCrowdsale ([owner, wallet, investor, purchaser,
             it('denies refunds twice', async function () {
               await this.crowdsale.claimRefund(investor, { gasPrice: 0 });
               await expectRevert(this.crowdsale.claimRefund(investor),
-                'FriendlyCrowdsale: no deposit'
+                'FriendlyCrowdsale: no deposit',
               );
             });
 
             it('denies refunds if not investor', async function () {
               await expectRevert(this.crowdsale.claimRefund(purchaser),
-                'FriendlyCrowdsale: no deposit'
+                'FriendlyCrowdsale: no deposit',
               );
             });
           });
@@ -316,7 +316,7 @@ function shouldBehaveLikeFriendlyCrowdsale ([owner, wallet, investor, purchaser,
 
             it('denies refunds', async function () {
               await expectRevert(this.crowdsale.claimRefund(investor),
-                'FriendlyCrowdsale: not refunding'
+                'FriendlyCrowdsale: not refunding',
               );
             });
 
@@ -339,7 +339,7 @@ function shouldBehaveLikeFriendlyCrowdsale ([owner, wallet, investor, purchaser,
 
         it('denies setting expired and withdraw', async function () {
           await expectRevert(this.crowdsale.setExpiredAndWithdraw({ from: owner }),
-            'FriendlyCrowdsale: not expired'
+            'FriendlyCrowdsale: not expired',
           );
         });
       });
@@ -353,7 +353,7 @@ function shouldBehaveLikeFriendlyCrowdsale ([owner, wallet, investor, purchaser,
 
         it('denies other account setting expired and withdraw', async function () {
           await expectRevert(this.crowdsale.setExpiredAndWithdraw({ from: other }),
-            'OperatorRole: caller does not have the Operator role'
+            'OperatorRole: caller does not have the Operator role',
           );
         });
 

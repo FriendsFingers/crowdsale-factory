@@ -1,4 +1,4 @@
-const { BN, constants, ether, expectRevert, time } = require('openzeppelin-test-helpers');
+const { BN, constants, ether, expectRevert, time } = require('@openzeppelin/test-helpers');
 const { ZERO_ADDRESS } = constants;
 
 const { shouldBehaveLikeFriendlyCrowdsale } = require('./behaviours/FriendlyCrowdsale.behaviour');
@@ -49,9 +49,9 @@ contract('FriendlyCrowdsale', function ([owner, wallet, investor, purchaser, fee
           0,
           wallet,
           this.token.address,
-          feeWallet
+          feeWallet,
         ),
-        'Crowdsale: rate is 0'
+        'Crowdsale: rate is 0',
       );
     });
 
@@ -65,9 +65,9 @@ contract('FriendlyCrowdsale', function ([owner, wallet, investor, purchaser, fee
           this.rate,
           ZERO_ADDRESS,
           this.token.address,
-          feeWallet
+          feeWallet,
         ),
-        'Crowdsale: wallet is the zero address'
+        'Crowdsale: wallet is the zero address',
       );
     });
 
@@ -81,9 +81,9 @@ contract('FriendlyCrowdsale', function ([owner, wallet, investor, purchaser, fee
           this.rate,
           wallet,
           ZERO_ADDRESS,
-          feeWallet
+          feeWallet,
         ),
-        'Crowdsale: token is the zero address'
+        'Crowdsale: token is the zero address',
       );
     });
 
@@ -97,9 +97,9 @@ contract('FriendlyCrowdsale', function ([owner, wallet, investor, purchaser, fee
           this.rate,
           wallet,
           this.token.address,
-          ZERO_ADDRESS
+          ZERO_ADDRESS,
         ),
-        'FriendlyCrowdsale: feeWallet is the zero address'
+        'FriendlyCrowdsale: feeWallet is the zero address',
       );
     });
 
@@ -113,9 +113,9 @@ contract('FriendlyCrowdsale', function ([owner, wallet, investor, purchaser, fee
           this.rate,
           wallet,
           this.token.address,
-          feeWallet
+          feeWallet,
         ),
-        'TimedCrowdsale: opening time is before current time'
+        'TimedCrowdsale: opening time is before current time',
       );
     });
 
@@ -129,9 +129,9 @@ contract('FriendlyCrowdsale', function ([owner, wallet, investor, purchaser, fee
           this.rate,
           wallet,
           this.token.address,
-          feeWallet
+          feeWallet,
         ),
-        'TimedCrowdsale: opening time is not before closing time'
+        'TimedCrowdsale: opening time is not before closing time',
       );
     });
 
@@ -145,9 +145,9 @@ contract('FriendlyCrowdsale', function ([owner, wallet, investor, purchaser, fee
           this.rate,
           wallet,
           this.token.address,
-          feeWallet
+          feeWallet,
         ),
-        'TimedCrowdsale: opening time is not before closing time'
+        'TimedCrowdsale: opening time is not before closing time',
       );
     });
 
@@ -161,9 +161,9 @@ contract('FriendlyCrowdsale', function ([owner, wallet, investor, purchaser, fee
           this.rate,
           wallet,
           this.token.address,
-          feeWallet
+          feeWallet,
         ),
-        'CappedCrowdsale: cap is 0'
+        'CappedCrowdsale: cap is 0',
       );
     });
 
@@ -177,9 +177,9 @@ contract('FriendlyCrowdsale', function ([owner, wallet, investor, purchaser, fee
           this.rate,
           wallet,
           this.token.address,
-          feeWallet
+          feeWallet,
         ),
-        'FriendlyCrowdsale: goal is 0'
+        'FriendlyCrowdsale: goal is 0',
       );
     });
 
@@ -193,9 +193,9 @@ contract('FriendlyCrowdsale', function ([owner, wallet, investor, purchaser, fee
           this.rate,
           wallet,
           this.token.address,
-          feeWallet
+          feeWallet,
         ),
-        'FriendlyCrowdsale: goal is not less or equal cap'
+        'FriendlyCrowdsale: goal is not less or equal cap',
       );
     });
 
@@ -210,7 +210,7 @@ contract('FriendlyCrowdsale', function ([owner, wallet, investor, purchaser, fee
           wallet,
           this.token.address,
           feeWallet,
-          { from: owner }
+          { from: owner },
         );
 
         await this.token.transfer(this.crowdsale.address, this.maxTokenSupply, { from: owner });

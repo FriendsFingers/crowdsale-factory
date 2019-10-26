@@ -1,9 +1,9 @@
-const { expectEvent, expectRevert, time } = require('openzeppelin-test-helpers');
+const { expectEvent, expectRevert, time } = require('@openzeppelin/test-helpers');
 
 function shouldBehaveLikeFinalizableCrowdsale ([other]) {
   it('cannot be finalized before ending', async function () {
     await expectRevert(this.crowdsale.finalize({ from: other }),
-      'FinalizableCrowdsale: not closed'
+      'FinalizableCrowdsale: not closed',
     );
   });
 
@@ -16,7 +16,7 @@ function shouldBehaveLikeFinalizableCrowdsale ([other]) {
     await time.increaseTo(this.afterClosingTime);
     await this.crowdsale.finalize({ from: other });
     await expectRevert(this.crowdsale.finalize({ from: other }),
-      'FinalizableCrowdsale: already finalized'
+      'FinalizableCrowdsale: already finalized',
     );
   });
 
