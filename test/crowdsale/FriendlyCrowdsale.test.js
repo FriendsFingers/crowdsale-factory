@@ -25,6 +25,8 @@ contract('FriendlyCrowdsale', function ([owner, wallet, investor, purchaser, fee
 
     this.rate = new BN(1000);
 
+    this.feePerMille = new BN(50); // 50 per mille, 5%
+
     this.maxTokenSupply = this.cap.mul(this.rate);
 
     this.escrowState = {
@@ -50,6 +52,7 @@ contract('FriendlyCrowdsale', function ([owner, wallet, investor, purchaser, fee
           wallet,
           this.token.address,
           feeWallet,
+          this.feePerMille,
         ),
         'Crowdsale: rate is 0',
       );
@@ -66,6 +69,7 @@ contract('FriendlyCrowdsale', function ([owner, wallet, investor, purchaser, fee
           ZERO_ADDRESS,
           this.token.address,
           feeWallet,
+          this.feePerMille,
         ),
         'Crowdsale: wallet is the zero address',
       );
@@ -82,6 +86,7 @@ contract('FriendlyCrowdsale', function ([owner, wallet, investor, purchaser, fee
           wallet,
           ZERO_ADDRESS,
           feeWallet,
+          this.feePerMille,
         ),
         'Crowdsale: token is the zero address',
       );
@@ -98,6 +103,7 @@ contract('FriendlyCrowdsale', function ([owner, wallet, investor, purchaser, fee
           wallet,
           this.token.address,
           ZERO_ADDRESS,
+          this.feePerMille,
         ),
         'FriendlyCrowdsale: feeWallet is the zero address',
       );
@@ -114,6 +120,7 @@ contract('FriendlyCrowdsale', function ([owner, wallet, investor, purchaser, fee
           wallet,
           this.token.address,
           feeWallet,
+          this.feePerMille,
         ),
         'TimedCrowdsale: opening time is before current time',
       );
@@ -130,6 +137,7 @@ contract('FriendlyCrowdsale', function ([owner, wallet, investor, purchaser, fee
           wallet,
           this.token.address,
           feeWallet,
+          this.feePerMille,
         ),
         'TimedCrowdsale: opening time is not before closing time',
       );
@@ -146,6 +154,7 @@ contract('FriendlyCrowdsale', function ([owner, wallet, investor, purchaser, fee
           wallet,
           this.token.address,
           feeWallet,
+          this.feePerMille,
         ),
         'TimedCrowdsale: opening time is not before closing time',
       );
@@ -162,6 +171,7 @@ contract('FriendlyCrowdsale', function ([owner, wallet, investor, purchaser, fee
           wallet,
           this.token.address,
           feeWallet,
+          this.feePerMille,
         ),
         'CappedCrowdsale: cap is 0',
       );
@@ -178,6 +188,7 @@ contract('FriendlyCrowdsale', function ([owner, wallet, investor, purchaser, fee
           wallet,
           this.token.address,
           feeWallet,
+          this.feePerMille,
         ),
         'FriendlyCrowdsale: goal is 0',
       );
@@ -194,6 +205,7 @@ contract('FriendlyCrowdsale', function ([owner, wallet, investor, purchaser, fee
           wallet,
           this.token.address,
           feeWallet,
+          this.feePerMille,
         ),
         'FriendlyCrowdsale: goal is not less or equal cap',
       );
@@ -210,6 +222,7 @@ contract('FriendlyCrowdsale', function ([owner, wallet, investor, purchaser, fee
           wallet,
           this.token.address,
           feeWallet,
+          this.feePerMille,
           { from: owner },
         );
 
@@ -246,6 +259,10 @@ contract('FriendlyCrowdsale', function ([owner, wallet, investor, purchaser, fee
 
       it('feeWallet should be right set', async function () {
         (await this.crowdsale.feeWallet()).should.be.equal(feeWallet);
+      });
+
+      it('feePerMille should be right set', async function () {
+        (await this.crowdsale.feePerMille()).should.be.bignumber.equal(this.feePerMille);
       });
 
       context('test FriendlyCrowdale behavior', function () {

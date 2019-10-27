@@ -26,8 +26,11 @@ contract FriendlyCrowdsale is FinalizableCrowdsale, CappedCrowdsale, OperatorRol
 
     State private _state;
 
-    // Address where fee are collected
+    // address where fee are collected
     address payable private _feeWallet;
+
+    // per mille rate fee
+    uint256 public _feePerMille;
 
     // list of addresses who contributed in crowdsales
     address[] private _investors;
@@ -46,6 +49,8 @@ contract FriendlyCrowdsale is FinalizableCrowdsale, CappedCrowdsale, OperatorRol
      * @param rate Number of token units a buyer gets per wei
      * @param wallet Address where collected funds will be forwarded to
      * @param token Address of the token being sold
+     * @param feeWallet Address of the fee wallet
+     * @param feePerMille The per mille rate fee
      */
     constructor(
         uint256 openingTime,
@@ -55,7 +60,8 @@ contract FriendlyCrowdsale is FinalizableCrowdsale, CappedCrowdsale, OperatorRol
         uint256 rate,
         address payable wallet,
         IERC20 token,
-        address payable feeWallet
+        address payable feeWallet,
+        uint256 feePerMille
     )
         public
         Crowdsale(rate, wallet, token)
@@ -68,6 +74,7 @@ contract FriendlyCrowdsale is FinalizableCrowdsale, CappedCrowdsale, OperatorRol
 
         _goal = goal;
         _feeWallet = feeWallet;
+        _feePerMille = feePerMille;
 
         _state = State.Review;
     }
@@ -77,6 +84,13 @@ contract FriendlyCrowdsale is FinalizableCrowdsale, CappedCrowdsale, OperatorRol
      */
     function feeWallet() public view returns (address) {
         return _feeWallet;
+    }
+
+    /**
+     * @return the per mille rate fee.
+     */
+    function feePerMille() public view returns (uint256) {
+        return _feePerMille;
     }
 
     /**
@@ -239,7 +253,7 @@ contract FriendlyCrowdsale is FinalizableCrowdsale, CappedCrowdsale, OperatorRol
     function _close() internal {
         _state = State.Closed;
 
-        // TODO add fee percent
+        _feeWallet.transfer(address(this).balance.mul(_feePerMille).div(1000));
 
         wallet().transfer(address(this).balance);
 

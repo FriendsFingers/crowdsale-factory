@@ -47,6 +47,7 @@ function shouldBehaveLikeFriendlyCrowdsale ([owner, wallet, investor, purchaser,
 
     beforeEach(async function () {
       this.preWalletBalance = await balance.current(wallet);
+      this.preFeeWalletBalance = await balance.current(feeWallet);
     });
 
     it('investor does not exist', async function () {
@@ -278,6 +279,8 @@ function shouldBehaveLikeFriendlyCrowdsale ([owner, wallet, investor, purchaser,
         context('with reached goal', function () {
           beforeEach(async function () {
             await this.crowdsale.sendTransaction({ value: this.goal, from: investor });
+
+            this.expectedFee = this.goal.mul(this.feePerMille).divn(1000);
           });
 
           it('ended should be false', async function () {
@@ -320,9 +323,16 @@ function shouldBehaveLikeFriendlyCrowdsale ([owner, wallet, investor, purchaser,
               );
             });
 
+            it('forwards fee to fee wallet', async function () {
+              const postFeeWalletBalance = await balance.current(feeWallet);
+              expect(postFeeWalletBalance.sub(this.preFeeWalletBalance)).to.be.bignumber.equal(this.expectedFee);
+            });
+
             it('forwards funds to wallet', async function () {
               const postWalletBalance = await balance.current(wallet);
-              expect(postWalletBalance.sub(this.preWalletBalance)).to.be.bignumber.equal(this.goal);
+              expect(
+                postWalletBalance.sub(this.preWalletBalance),
+              ).to.be.bignumber.equal(this.goal.sub(this.expectedFee));
             });
           });
         });
