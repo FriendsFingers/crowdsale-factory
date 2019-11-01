@@ -192,6 +192,9 @@ contract FriendlyCrowdsale is FinalizableCrowdsale, CappedCrowdsale, OperatorRol
         emit Withdrawn(refundee, payment);
     }
 
+    /**
+     * @dev Set crowdsale expired and withdraw funds.
+     */
     function setExpiredAndWithdraw() public onlyOperator {
         // solhint-disable-next-line not-rely-on-time
         require(block.timestamp >= closingTime() + 365 days, "FriendlyCrowdsale: not expired");
