@@ -75,12 +75,12 @@
     "solhint": "^2.3.0",
     "solidity-coverage": "github:rotcivegaf/solidity-coverage#5875f5b7bc74d447f3312c9c0e9fc7814b482477",
     "surya": "^0.2.11",
-    "truffle": "^5.0.42",
+    "truffle": "^5.0.43",
     "truffle-flattener": "1.2.11",
     "web3": "^1.2.2"
   },
   "dependencies": {
     "dao-smartcontracts": "github:FriendsFingers/dao-smartcontracts#master",
-    "eth-token-recover": "2.3.4"
+    "eth-token-recover": "2.4.0"
   }
 }
