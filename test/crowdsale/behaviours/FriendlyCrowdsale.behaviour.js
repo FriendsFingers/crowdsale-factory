@@ -239,6 +239,20 @@ function shouldBehaveLikeFriendlyCrowdsale ([owner, wallet, investor, purchaser,
               const { logs } = await this.crowdsale.finalize({ from: other });
               expectEvent.inLogs(logs, 'RefundsEnabled');
             });
+
+            it('move remaining tokens to wallet', async function () {
+              await time.increaseTo(this.afterClosingTime);
+
+              const preContractTokenBalance = await this.token.balanceOf(this.crowdsale.address);
+              const preWalletTokenBalance = await this.token.balanceOf(wallet);
+
+              await this.crowdsale.finalize({ from: other });
+
+              expect(await this.token.balanceOf(this.crowdsale.address)).to.be.bignumber.equal(new BN(0));
+              expect(await this.token.balanceOf(wallet)).to.be.bignumber.equal(
+                preWalletTokenBalance.add(preContractTokenBalance),
+              );
+            });
           });
 
           context('after closing time and finalization', function () {
@@ -297,6 +311,20 @@ function shouldBehaveLikeFriendlyCrowdsale ([owner, wallet, investor, purchaser,
               const { logs } = await this.crowdsale.finalize({ from: other });
               expectEvent.inLogs(logs, 'RefundsClosed');
             });
+
+            it('move remaining tokens to wallet', async function () {
+              await time.increaseTo(this.afterClosingTime);
+
+              const preContractTokenBalance = await this.token.balanceOf(this.crowdsale.address);
+              const preWalletTokenBalance = await this.token.balanceOf(wallet);
+
+              await this.crowdsale.finalize({ from: other });
+
+              expect(await this.token.balanceOf(this.crowdsale.address)).to.be.bignumber.equal(new BN(0));
+              expect(await this.token.balanceOf(wallet)).to.be.bignumber.equal(
+                preWalletTokenBalance.add(preContractTokenBalance),
+              );
+            });
           });
 
           context('after closing time and finalization', function () {
@@ -333,6 +361,80 @@ function shouldBehaveLikeFriendlyCrowdsale ([owner, wallet, investor, purchaser,
               expect(
                 postWalletBalance.sub(this.preWalletBalance),
               ).to.be.bignumber.equal(this.goal.sub(this.expectedFee));
+            });
+          });
+        });
+
+        context('with reached cap', function () {
+          beforeEach(async function () {
+            await this.crowdsale.sendTransaction({ value: this.cap, from: investor });
+
+            this.expectedFee = this.cap.mul(this.feePerMille).divn(1000);
+          });
+
+          it('ended should be true', async function () {
+            expect(await this.crowdsale.ended()).to.be.equal(true);
+          });
+
+          it('goalReached should be true', async function () {
+            expect(await this.crowdsale.goalReached()).to.be.equal(true);
+          });
+
+          context('finalizing', function () {
+            it('emits a RefundsClosed event', async function () {
+              await time.increaseTo(this.afterClosingTime);
+              const { logs } = await this.crowdsale.finalize({ from: other });
+              expectEvent.inLogs(logs, 'RefundsClosed');
+            });
+
+            it('remaining tokens should be zero', async function () {
+              await time.increaseTo(this.afterClosingTime);
+
+              const preContractTokenBalance = await this.token.balanceOf(this.crowdsale.address);
+              const preWalletTokenBalance = await this.token.balanceOf(wallet);
+
+              expect(preContractTokenBalance).to.be.bignumber.equal(new BN(0));
+
+              await this.crowdsale.finalize({ from: other });
+
+              expect(await this.token.balanceOf(wallet)).to.be.bignumber.equal(preWalletTokenBalance);
+            });
+          });
+
+          context('after closing time and finalization', function () {
+            beforeEach(async function () {
+              await time.increaseTo(this.afterClosingTime);
+              await this.crowdsale.finalize({ from: other });
+            });
+
+            it('state should be closed', async function () {
+              expect(await this.crowdsale.state()).to.be.bignumber.equal(this.escrowState.closed);
+            });
+
+            it('ended should be true', async function () {
+              expect(await this.crowdsale.ended()).to.be.equal(true);
+            });
+
+            it('goalReached should be true', async function () {
+              expect(await this.crowdsale.goalReached()).to.be.equal(true);
+            });
+
+            it('denies refunds', async function () {
+              await expectRevert(this.crowdsale.claimRefund(investor),
+                'FriendlyCrowdsale: not refunding',
+              );
+            });
+
+            it('forwards fee to fee wallet', async function () {
+              const postFeeWalletBalance = await balance.current(feeWallet);
+              expect(postFeeWalletBalance.sub(this.preFeeWalletBalance)).to.be.bignumber.equal(this.expectedFee);
+            });
+
+            it('forwards funds to wallet', async function () {
+              const postWalletBalance = await balance.current(wallet);
+              expect(
+                postWalletBalance.sub(this.preWalletBalance),
+              ).to.be.bignumber.equal(this.cap.sub(this.expectedFee));
             });
           });
         });

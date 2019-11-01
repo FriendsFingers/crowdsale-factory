@@ -239,6 +239,8 @@ contract FriendlyCrowdsale is FinalizableCrowdsale, CappedCrowdsale, OperatorRol
         } else {
             _enableRefunds();
         }
+
+        _recoverRemainingTokens();
     }
 
     /**
@@ -269,5 +271,14 @@ contract FriendlyCrowdsale is FinalizableCrowdsale, CappedCrowdsale, OperatorRol
     function _enableRefunds() internal {
         _state = State.Refunding;
         emit RefundsEnabled();
+    }
+
+    /**
+     * @dev Recover remaining tokens to wallet.
+     */
+    function _recoverRemainingTokens() internal {
+        if (token().balanceOf(address(this)) > 0) {
+            token().transfer(wallet(), token().balanceOf(address(this)));
+        }
     }
 }
