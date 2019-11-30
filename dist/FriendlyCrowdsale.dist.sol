@@ -1,4 +1,4 @@
-pragma solidity ^0.5.12;
+pragma solidity ^0.5.13;
 
 // File: @openzeppelin/contracts/math/SafeMath.sol
 
@@ -978,6 +978,9 @@ contract FriendlyCrowdsale is FinalizableCrowdsale, CappedCrowdsale, OperatorRol
         emit Withdrawn(refundee, payment);
     }
 
+    /**
+     * @dev Set crowdsale expired and withdraw funds.
+     */
     function setExpiredAndWithdraw() public onlyOperator {
         // solhint-disable-next-line not-rely-on-time
         require(block.timestamp >= closingTime() + 365 days, "FriendlyCrowdsale: not expired");
@@ -1022,6 +1025,8 @@ contract FriendlyCrowdsale is FinalizableCrowdsale, CappedCrowdsale, OperatorRol
         } else {
             _enableRefunds();
         }
+
+        _recoverRemainingTokens();
     }
 
     /**
@@ -1052,5 +1057,14 @@ contract FriendlyCrowdsale is FinalizableCrowdsale, CappedCrowdsale, OperatorRol
     function _enableRefunds() internal {
         _state = State.Refunding;
         emit RefundsEnabled();
+    }
+
+    /**
+     * @dev Recover remaining tokens to wallet.
+     */
+    function _recoverRemainingTokens() internal {
+        if (token().balanceOf(address(this)) > 0) {
+            token().transfer(wallet(), token().balanceOf(address(this)));
+        }
     }
 }
