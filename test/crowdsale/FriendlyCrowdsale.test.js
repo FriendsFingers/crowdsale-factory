@@ -35,6 +35,7 @@ contract('FriendlyCrowdsale', function ([owner, wallet, investor, purchaser, fee
       refunding: new BN(2),
       closed: new BN(3),
       expired: new BN(4),
+      rejected: new BN(5),
     };
 
     this.token = await ERC20Mock.new(owner, this.maxTokenSupply, { from: owner });

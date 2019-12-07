@@ -54,7 +54,7 @@ function shouldBehaveLikeFriendlyCrowdsale ([owner, wallet, investor, purchaser,
       expect(await this.crowdsale.investorExists(investor)).to.be.equal(false);
     });
 
-    context('before enabling', function () {
+    context('before enabling or rejecting', function () {
       it('state should be review', async function () {
         expect(await this.crowdsale.state()).to.be.bignumber.equal(this.escrowState.review);
       });
@@ -65,16 +65,56 @@ function shouldBehaveLikeFriendlyCrowdsale ([owner, wallet, investor, purchaser,
       });
     });
 
+    it('disallow other to reject crowdsale', async function () {
+      await expectRevert(this.crowdsale.reject({ from: other }),
+        'OperatorRole: caller does not have the Operator role',
+      );
+    });
+
     it('disallow other to enable crowdsale', async function () {
       await expectRevert(this.crowdsale.enable({ from: other }),
         'OperatorRole: caller does not have the Operator role',
       );
     });
 
+    context('rejecting', function () {
+      it('move tokens to wallet', async function () {
+        const preContractTokenBalance = await this.token.balanceOf(this.crowdsale.address);
+        const preWalletTokenBalance = await this.token.balanceOf(wallet);
+
+        await this.crowdsale.reject({ from: owner });
+
+        expect(await this.token.balanceOf(this.crowdsale.address)).to.be.bignumber.equal(new BN(0));
+        expect(await this.token.balanceOf(wallet)).to.be.bignumber.equal(
+          preWalletTokenBalance.add(preContractTokenBalance),
+        );
+      });
+
+      it('emits a Rejected event', async function () {
+        const { logs } = await this.crowdsale.reject({ from: owner });
+        expectEvent.inLogs(logs, 'Rejected');
+      });
+    });
+
     context('enabling', function () {
       it('emits a Enabled event', async function () {
         const { logs } = await this.crowdsale.enable({ from: owner });
         expectEvent.inLogs(logs, 'Enabled');
+      });
+    });
+
+    context('after rejecting', function () {
+      beforeEach(async function () {
+        await this.crowdsale.reject({ from: owner });
+      });
+
+      it('state should be rejected', async function () {
+        expect(await this.crowdsale.state()).to.be.bignumber.equal(this.escrowState.rejected);
+      });
+
+      it('should reject payments', async function () {
+        await time.increaseTo(this.openingTime);
+        await expectRevert(this.crowdsale.send(value), 'FriendlyCrowdsale: not active');
       });
     });
 

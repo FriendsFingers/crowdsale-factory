@@ -11,7 +11,7 @@ import "../access/roles/OperatorRole.sol";
  * allowing investors to purchase tokens with ether.
  */
 contract FriendlyCrowdsale is FinalizableCrowdsale, CappedCrowdsale, OperatorRole {
-    enum State { Review, Active, Refunding, Closed, Expired }
+    enum State { Review, Active, Refunding, Closed, Expired, Rejected }
 
     struct Escrow {
         bool exists;
@@ -19,6 +19,7 @@ contract FriendlyCrowdsale is FinalizableCrowdsale, CappedCrowdsale, OperatorRol
     }
 
     event Enabled();
+    event Rejected();
     event RefundsClosed();
     event RefundsEnabled();
     event Expired();
@@ -172,6 +173,18 @@ contract FriendlyCrowdsale is FinalizableCrowdsale, CappedCrowdsale, OperatorRol
         _state = State.Active;
 
         emit Enabled();
+    }
+
+    /**
+     * @dev Reject the crowdsale
+     */
+    function reject() public onlyOperator {
+        require(_state == State.Review, "FriendlyCrowdsale: not reviewing");
+        _state = State.Rejected;
+
+        _recoverRemainingTokens();
+
+        emit Rejected();
     }
 
     /**

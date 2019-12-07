@@ -5,7 +5,7 @@
 
 |  File Name  |  SHA-1 Hash  |
 |-------------|--------------|
-| dist/FriendlyCrowdsale.dist.sol | 9488f27e2b9c1e12d5b2d2e97abcc506ef101b23 |
+| dist/FriendlyCrowdsale.dist.sol | 8fbcdcdc9c2257a55393ea748920dc75631a9f4c |
 
 
 ### Contracts Description Table
@@ -18,9 +18,17 @@
 | **SafeMath** | Library |  |||
 | └ | add | Internal 🔒 |   | |
 | └ | sub | Internal 🔒 |   | |
+| └ | sub | Internal 🔒 |   | |
 | └ | mul | Internal 🔒 |   | |
 | └ | div | Internal 🔒 |   | |
+| └ | div | Internal 🔒 |   | |
 | └ | mod | Internal 🔒 |   | |
+| └ | mod | Internal 🔒 |   | |
+||||||
+| **Context** | Implementation |  |||
+| └ | \<Constructor\> | Internal 🔒 | 🛑  | |
+| └ | _msgSender | Internal 🔒 |   | |
+| └ | _msgData | Internal 🔒 |   | |
 ||||||
 | **IERC20** | Interface |  |||
 | └ | totalSupply | External ❗️ |   |NO❗️ |
@@ -32,6 +40,8 @@
 ||||||
 | **Address** | Library |  |||
 | └ | isContract | Internal 🔒 |   | |
+| └ | toPayable | Internal 🔒 |   | |
+| └ | sendValue | Internal 🔒 | 🛑  | |
 ||||||
 | **SafeERC20** | Library |  |||
 | └ | safeTransfer | Internal 🔒 | 🛑  | |
@@ -44,7 +54,7 @@
 | **ReentrancyGuard** | Implementation |  |||
 | └ | \<Constructor\> | Internal 🔒 | 🛑  | |
 ||||||
-| **Crowdsale** | Implementation | ReentrancyGuard |||
+| **Crowdsale** | Implementation | Context, ReentrancyGuard |||
 | └ | \<Constructor\> | Public ❗️ | 🛑  | |
 | └ | \<Fallback\> | External ❗️ |  💵 |NO❗️ |
 | └ | token | Public ❗️ |   |NO❗️ |
@@ -108,6 +118,7 @@
 | └ | getInvestorAddress | Public ❗️ |   |NO❗️ |
 | └ | weiContribution | Public ❗️ |   |NO❗️ |
 | └ | enable | Public ❗️ | 🛑  | onlyOperator |
+| └ | reject | Public ❗️ | 🛑  | onlyOperator |
 | └ | claimRefund | Public ❗️ | 🛑  |NO❗️ |
 | └ | setExpiredAndWithdraw | Public ❗️ | 🛑  | onlyOperator |
 | └ | _preValidatePurchase | Internal 🔒 |   | |
@@ -116,6 +127,7 @@
 | └ | _forwardFunds | Internal 🔒 | 🛑  | |
 | └ | _close | Internal 🔒 | 🛑  | |
 | └ | _enableRefunds | Internal 🔒 | 🛑  | |
+| └ | _recoverRemainingTokens | Internal 🔒 | 🛑  | |
 
 
 ### Legend
