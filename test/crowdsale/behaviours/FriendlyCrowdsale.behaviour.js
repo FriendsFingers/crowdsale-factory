@@ -133,6 +133,12 @@ function shouldBehaveLikeFriendlyCrowdsale ([owner, wallet, investor, purchaser,
         );
       });
 
+      it('disallow to be rejected', async function () {
+        await expectRevert(this.crowdsale.reject({ from: owner }),
+          'FriendlyCrowdsale: not reviewing',
+        );
+      });
+
       context('before opening time', function () {
         it('started should be false', async function () {
           expect(await this.crowdsale.started()).to.be.equal(false);
