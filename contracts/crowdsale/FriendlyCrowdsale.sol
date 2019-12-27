@@ -83,7 +83,7 @@ contract FriendlyCrowdsale is FinalizableCrowdsale, CappedCrowdsale, OperatorRol
     /**
      * @return address where fee are collected.
      */
-    function feeWallet() public view returns (address) {
+    function feeWallet() public view returns (address payable) {
         return _feeWallet;
     }
 
