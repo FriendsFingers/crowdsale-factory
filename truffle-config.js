@@ -7,6 +7,7 @@ const solcStable = {
       enabled: true,
       runs: 200,
     },
+    evmVersion: 'istanbul',
   },
 };
 
