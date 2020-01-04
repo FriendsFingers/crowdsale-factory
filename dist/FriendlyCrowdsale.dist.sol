@@ -1,4 +1,4 @@
-pragma solidity ^0.5.15;
+pragma solidity ^0.5.16;
 
 // File: @openzeppelin/contracts/math/SafeMath.sol
 
@@ -988,7 +988,7 @@ contract FriendlyCrowdsale is FinalizableCrowdsale, CappedCrowdsale, OperatorRol
     /**
      * @return address where fee are collected.
      */
-    function feeWallet() public view returns (address) {
+    function feeWallet() public view returns (address payable) {
         return _feeWallet;
     }
 
