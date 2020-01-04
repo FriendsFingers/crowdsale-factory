@@ -83,6 +83,6 @@
   "dependencies": {
     "@openzeppelin/contracts": "2.4.0",
     "dao-smartcontracts": "github:FriendsFingers/dao-smartcontracts#master",
-    "eth-token-recover": "2.4.2"
+    "eth-token-recover": "2.4.3"
   }
 }
