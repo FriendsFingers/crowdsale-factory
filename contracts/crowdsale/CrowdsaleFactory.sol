@@ -3,7 +3,9 @@ pragma solidity ^0.5.16;
 import "eth-token-recover/contracts/TokenRecover.sol";
 import "./FriendlyCrowdsale.sol";
 
-contract CrowdsaleFactory is TokenRecover {
+contract CrowdsaleFactory is OperatorRole, TokenRecover {
+
+    event CrowdsaleCreated(address crowdsale);
 
     // address where fee are collected
     address payable private _feeWallet;
@@ -15,12 +17,7 @@ contract CrowdsaleFactory is TokenRecover {
      * @param feeWallet Address of the fee wallet
      * @param feePerMille The per mille rate fee
      */
-    constructor(
-        address payable feeWallet,
-        uint256 feePerMille
-    )
-    public
-    {
+    constructor(address payable feeWallet, uint256 feePerMille) public {
         require(feeWallet != address(0), "CrowdsaleFactory: feeWallet is the zero address");
 
         _feeWallet = feeWallet;
@@ -39,5 +36,31 @@ contract CrowdsaleFactory is TokenRecover {
      */
     function feePerMille() public view returns (uint256) {
         return _feePerMille;
+    }
+
+    function createCrowdsale(
+        uint256 openingTime,
+        uint256 closingTime,
+        uint256 cap,
+        uint256 goal,
+        uint256 rate,
+        address payable wallet,
+        IERC20 token
+    )
+        public
+    {
+        FriendlyCrowdsale crowdsale = new FriendlyCrowdsale(
+            openingTime,
+            closingTime,
+            cap,
+            goal,
+            rate,
+            wallet,
+            token,
+            _feeWallet,
+            _feePerMille
+        );
+
+        emit CrowdsaleCreated(address(crowdsale));
     }
 }

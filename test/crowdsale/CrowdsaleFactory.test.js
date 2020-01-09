@@ -1,9 +1,10 @@
-const { BN, constants, expectRevert, time } = require('@openzeppelin/test-helpers');
+const { BN, constants, ether, expectRevert, time } = require('@openzeppelin/test-helpers');
 const { ZERO_ADDRESS } = constants;
 
 const { shouldBehaveLikeCrowdsaleFactory } = require('./behaviours/CrowdsaleFactory.behaviour');
 
 const CrowdsaleFactory = artifacts.require('CrowdsaleFactory');
+const ERC20Mock = artifacts.require('ERC20Mock');
 
 contract('CrowdsaleFactory', function ([owner, wallet, investor, purchaser, feeWallet, other]) {
   before(async function () {
@@ -13,6 +14,22 @@ contract('CrowdsaleFactory', function ([owner, wallet, investor, purchaser, feeW
 
   beforeEach(async function () {
     this.feePerMille = new BN(50); // 50 per mille, 5%
+
+    this.openingTime = (await time.latest()).add(time.duration.weeks(1));
+    this.closingTime = this.openingTime.add(time.duration.weeks(1));
+    this.afterClosingTime = this.closingTime.add(time.duration.seconds(1));
+
+    this.cap = ether('3');
+
+    this.goal = ether('2');
+
+    this.rate = new BN(1000);
+
+    this.feePerMille = new BN(50); // 50 per mille, 5%
+
+    this.maxTokenSupply = this.cap.mul(this.rate);
+
+    this.token = await ERC20Mock.new(owner, this.maxTokenSupply, { from: owner });
   });
 
   context('like a CrowdsaleFactory', function () {
