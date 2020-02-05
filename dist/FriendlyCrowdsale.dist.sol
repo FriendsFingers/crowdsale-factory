@@ -271,19 +271,21 @@ library Address {
     /**
      * @dev Returns true if `account` is a contract.
      *
-     * This test is non-exhaustive, and there may be false-negatives: during the
-     * execution of a contract's constructor, its address will be reported as
-     * not containing a contract.
+     * [IMPORTANT]
+     * ====
+     * It is unsafe to assume that an address for which this function returns
+     * false is an externally-owned account (EOA) and not a contract.
      *
-     * IMPORTANT: It is unsafe to assume that an address for which this
-     * function returns false is an externally-owned account (EOA) and not a
-     * contract.
+     * Among others, `isContract` will return false for the following 
+     * types of addresses:
+     *
+     *  - an externally-owned account
+     *  - a contract in construction
+     *  - an address where a contract will be created
+     *  - an address where a contract lived, but was destroyed
+     * ====
      */
     function isContract(address account) internal view returns (bool) {
-        // This method relies in extcodesize, which returns 0 for contracts in
-        // construction, since the code is only stored at the end of the
-        // constructor execution.
-
         // According to EIP-1052, 0x0 is the value returned for not-yet created accounts
         // and 0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470 is returned
         // for accounts without code, i.e. `keccak256('')`
@@ -291,7 +293,7 @@ library Address {
         bytes32 accountHash = 0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470;
         // solhint-disable-next-line no-inline-assembly
         assembly { codehash := extcodehash(account) }
-        return (codehash != 0x0 && codehash != accountHash);
+        return (codehash != accountHash && codehash != 0x0);
     }
 
     /**
@@ -416,15 +418,25 @@ library SafeERC20 {
  * `nonReentrant` may not call one another. This can be worked around by making
  * those functions `private`, and then adding `external` `nonReentrant` entry
  * points to them.
+ *
+ * TIP: If you would like to learn more about reentrancy and alternative ways
+ * to protect against it, check out our blog post
+ * https://blog.openzeppelin.com/reentrancy-after-istanbul/[Reentrancy After Istanbul].
+ *
+ * _Since v2.5.0:_ this module is now much more gas efficient, given net gas
+ * metering changes introduced in the Istanbul hardfork.
  */
 contract ReentrancyGuard {
-    // counter to allow mutex lock with only one SSTORE operation
-    uint256 private _guardCounter;
+    bool private _notEntered;
 
     constructor () internal {
-        // The counter starts at one to prevent changing it from zero to a non-zero
-        // value, which is a more expensive operation.
-        _guardCounter = 1;
+        // Storing an initial non-zero value makes deployment a bit more
+        // expensive, but in exchange the refund on every call to nonReentrant
+        // will be lower in amount. Since refunds are capped to a percetange of
+        // the total transaction's gas, it is best to keep them low in cases
+        // like this one, to increase the likelihood of the full refund coming
+        // into effect.
+        _notEntered = true;
     }
 
     /**
@@ -435,10 +447,17 @@ contract ReentrancyGuard {
      * `private` function that does the actual work.
      */
     modifier nonReentrant() {
-        _guardCounter += 1;
-        uint256 localCounter = _guardCounter;
+        // On the first call to nonReentrant, _notEntered will be true
+        require(_notEntered, "ReentrancyGuard: reentrant call");
+
+        // Any calls to nonReentrant after this point will fail
+        _notEntered = false;
+
         _;
-        require(localCounter == _guardCounter, "ReentrancyGuard: reentrant call");
+
+        // By storing the original value once again, a refund is triggered (see
+        // https://eips.ethereum.org/EIPS/eip-2200)
+        _notEntered = true;
     }
 }
 
