@@ -5,7 +5,7 @@
 
 |  File Name  |  SHA-1 Hash  |
 |-------------|--------------|
-| dist/FriendlyCrowdsale.dist.sol | 8fbcdcdc9c2257a55393ea748920dc75631a9f4c |
+| dist/FriendlyCrowdsale.dist.sol | 949789363498a2c6c7857dc60806bbf49a9d53e5 |
 
 
 ### Contracts Description Table
@@ -26,7 +26,7 @@
 | └ | mod | Internal 🔒 |   | |
 ||||||
 | **Context** | Implementation |  |||
-| └ | \<Constructor\> | Internal 🔒 | 🛑  | |
+| └ | <Constructor> | Internal 🔒 | 🛑  | |
 | └ | _msgSender | Internal 🔒 |   | |
 | └ | _msgData | Internal 🔒 |   | |
 ||||||
@@ -52,11 +52,11 @@
 | └ | callOptionalReturn | Private 🔐 | 🛑  | |
 ||||||
 | **ReentrancyGuard** | Implementation |  |||
-| └ | \<Constructor\> | Internal 🔒 | 🛑  | |
+| └ | <Constructor> | Internal 🔒 | 🛑  | |
 ||||||
 | **Crowdsale** | Implementation | Context, ReentrancyGuard |||
-| └ | \<Constructor\> | Public ❗️ | 🛑  | |
-| └ | \<Fallback\> | External ❗️ |  💵 |NO❗️ |
+| └ | <Constructor> | Public ❗️ | 🛑  |NO❗️ |
+| └ | <Fallback> | External ❗️ |  💵 |NO❗️ |
 | └ | token | Public ❗️ |   |NO❗️ |
 | └ | wallet | Public ❗️ |   |NO❗️ |
 | └ | rate | Public ❗️ |   |NO❗️ |
@@ -71,7 +71,7 @@
 | └ | _forwardFunds | Internal 🔒 | 🛑  | |
 ||||||
 | **TimedCrowdsale** | Implementation | Crowdsale |||
-| └ | \<Constructor\> | Public ❗️ | 🛑  | |
+| └ | <Constructor> | Public ❗️ | 🛑  |NO❗️ |
 | └ | openingTime | Public ❗️ |   |NO❗️ |
 | └ | closingTime | Public ❗️ |   |NO❗️ |
 | └ | isOpen | Public ❗️ |   |NO❗️ |
@@ -80,13 +80,13 @@
 | └ | _extendTime | Internal 🔒 | 🛑  | |
 ||||||
 | **FinalizableCrowdsale** | Implementation | TimedCrowdsale |||
-| └ | \<Constructor\> | Internal 🔒 | 🛑  | |
+| └ | <Constructor> | Internal 🔒 | 🛑  | |
 | └ | finalized | Public ❗️ |   |NO❗️ |
 | └ | finalize | Public ❗️ | 🛑  |NO❗️ |
 | └ | _finalization | Internal 🔒 | 🛑  | |
 ||||||
 | **CappedCrowdsale** | Implementation | Crowdsale |||
-| └ | \<Constructor\> | Public ❗️ | 🛑  | |
+| └ | <Constructor> | Public ❗️ | 🛑  |NO❗️ |
 | └ | cap | Public ❗️ |   |NO❗️ |
 | └ | capReached | Public ❗️ |   |NO❗️ |
 | └ | _preValidatePurchase | Internal 🔒 |   | |
@@ -97,7 +97,7 @@
 | └ | has | Internal 🔒 |   | |
 ||||||
 | **OperatorRole** | Implementation |  |||
-| └ | \<Constructor\> | Internal 🔒 | 🛑  | |
+| └ | <Constructor> | Internal 🔒 | 🛑  | |
 | └ | isOperator | Public ❗️ |   |NO❗️ |
 | └ | addOperator | Public ❗️ | 🛑  | onlyOperator |
 | └ | renounceOperator | Public ❗️ | 🛑  |NO❗️ |
@@ -105,7 +105,7 @@
 | └ | _removeOperator | Internal 🔒 | 🛑  | |
 ||||||
 | **FriendlyCrowdsale** | Implementation | FinalizableCrowdsale, CappedCrowdsale, OperatorRole |||
-| └ | \<Constructor\> | Public ❗️ | 🛑  | Crowdsale TimedCrowdsale CappedCrowdsale |
+| └ | <Constructor> | Public ❗️ | 🛑  | Crowdsale TimedCrowdsale CappedCrowdsale |
 | └ | feeWallet | Public ❗️ |   |NO❗️ |
 | └ | feePerMille | Public ❗️ |   |NO❗️ |
 | └ | goal | Public ❗️ |   |NO❗️ |

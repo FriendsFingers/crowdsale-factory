@@ -121,7 +121,7 @@
 <text text-anchor="middle" x="744.1236" y="-2127.7" font-family="Times,serif" font-size="14.00" fill="#000000">ReentrancyGuard</text>
 <polyline fill="none" stroke="#000000" points="645.1089,-2119.5 843.1383,-2119.5 "/>
 <text text-anchor="start" x="653.1089" y="-2102.9" font-family="Times,serif" font-size="14.00" fill="#000000">Private:</text>
-<text text-anchor="start" x="653.1089" y="-2086.1" font-family="Times,serif" font-size="14.00" fill="#000000"> &#160;&#160;_guardCounter: uint256</text>
+<text text-anchor="start" x="653.1089" y="-2086.1" font-family="Times,serif" font-size="14.00" fill="#000000"> &#160;&#160;_notEntered: bool</text>
 <polyline fill="none" stroke="#000000" points="645.1089,-2077.9 843.1383,-2077.9 "/>
 <text text-anchor="start" x="653.1089" y="-2061.3" font-family="Times,serif" font-size="14.00" fill="#000000">Public:</text>
 <text text-anchor="start" x="653.1089" y="-2044.5" font-family="Times,serif" font-size="14.00" fill="#000000"> &#160;&#160;&#160;&lt;&lt;modifier&gt;&gt; nonReentrant()</text>
