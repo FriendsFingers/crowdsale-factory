@@ -67,13 +67,13 @@ function shouldBehaveLikeFriendlyCrowdsale ([owner, wallet, investor, purchaser,
 
     it('disallow other to reject crowdsale', async function () {
       await expectRevert(this.crowdsale.reject({ from: other }),
-        'OperatorRole: caller does not have the Operator role',
+        'Roles: caller does not have the OPERATOR role',
       );
     });
 
     it('disallow other to enable crowdsale', async function () {
       await expectRevert(this.crowdsale.enable({ from: other }),
-        'OperatorRole: caller does not have the Operator role',
+        'Roles: caller does not have the OPERATOR role',
       );
     });
 
@@ -511,7 +511,7 @@ function shouldBehaveLikeFriendlyCrowdsale ([owner, wallet, investor, purchaser,
 
         it('denies other account setting expired and withdraw', async function () {
           await expectRevert(this.crowdsale.setExpiredAndWithdraw({ from: other }),
-            'OperatorRole: caller does not have the Operator role',
+            'Roles: caller does not have the OPERATOR role',
           );
         });
 
