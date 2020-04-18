@@ -1,9 +1,9 @@
-pragma solidity ^0.5.17;
+pragma solidity ^0.6.6;
 
 import "eth-token-recover/contracts/TokenRecover.sol";
 import "./FriendlyCrowdsale.sol";
 
-contract CrowdsaleFactory is OperatorRole, TokenRecover {
+contract CrowdsaleFactory is Roles, TokenRecover {
 
     event CrowdsaleCreated(address crowdsale);
 
@@ -11,7 +11,7 @@ contract CrowdsaleFactory is OperatorRole, TokenRecover {
     address payable private _feeWallet;
 
     // per mille rate fee
-    uint256 public _feePerMille;
+    uint256 private _feePerMille;
 
     /**
      * @param feeWallet Address of the fee wallet

@@ -72,17 +72,16 @@
     "ganache-cli": "^6.9.1",
     "lite-server": "^2.5.4",
     "pify": "^5.0.0",
-    "sol2uml": "^1.1.15",
-    "solhint": "^2.3.1",
-    "solidity-coverage": "^0.7.2",
+    "sol2uml": "^1.1.17",
+    "solhint": "^3.0.0-rc.7",
+    "solidity-coverage": "^0.7.4",
     "surya": "^0.3.5",
-    "truffle": "^5.1.19",
-    "truffle-flattener": "1.2.11",
+    "truffle": "^5.1.22",
+    "truffle-flattener": "^1.4.3",
     "web3": "^1.2.6"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "2.5.0",
-    "dao-smartcontracts": "github:FriendsFingers/dao-smartcontracts#master",
-    "eth-token-recover": "2.5.0"
+    "@openzeppelin/contracts": "^3.0.0-rc.1",
+    "eth-token-recover": "vittominacori/eth-token-recover#next"
   }
 }
