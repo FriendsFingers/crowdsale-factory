@@ -28,6 +28,11 @@ function shouldBehaveLikeCrowdsaleFactory ([owner, wallet, investor, purchaser, 
     });
 
     describe('once deployed', function () {
+      it('owner should have OPERATOR role', async function () {
+        const OPERATOR_ROLE = web3.utils.soliditySha3('OPERATOR');
+        expect(await this.crowdsale.hasRole(OPERATOR_ROLE, owner)).to.equal(true);
+      });
+
       it('openingTime should be right set', async function () {
         (await this.crowdsale.openingTime()).should.be.bignumber.equal(this.openingTime);
       });

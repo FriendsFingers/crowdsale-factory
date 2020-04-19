@@ -62,5 +62,7 @@ contract CrowdsaleFactory is Roles, TokenRecover {
         );
 
         emit CrowdsaleCreated(address(crowdsale));
+
+        crowdsale.grantRole(OPERATOR_ROLE, owner());
     }
 }
