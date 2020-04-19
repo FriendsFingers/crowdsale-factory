@@ -58,6 +58,11 @@ function shouldBehaveLikeCrowdsale ([investor, wallet, purchaser]) {
       await this.crowdsale.sendTransaction({ value: value, from: investor });
       expect(await this.token.balanceOf(investor)).to.be.bignumber.equal(this.expectedTokenAmount);
     });
+
+    it('should update weiRaised', async function () {
+      await this.crowdsale.sendTransaction({ value: value, from: investor });
+      expect(await this.crowdsale.weiRaised()).to.be.bignumber.equal(value);
+    });
   });
 
   describe('low-level purchase', function () {
@@ -74,6 +79,11 @@ function shouldBehaveLikeCrowdsale ([investor, wallet, purchaser]) {
     it('should assign tokens to beneficiary', async function () {
       await this.crowdsale.buyTokens(investor, { value, from: purchaser });
       expect(await this.token.balanceOf(investor)).to.be.bignumber.equal(this.expectedTokenAmount);
+    });
+
+    it('should update weiRaised', async function () {
+      await this.crowdsale.buyTokens(investor, { value, from: purchaser });
+      expect(await this.crowdsale.weiRaised()).to.be.bignumber.equal(value);
     });
   });
 }
