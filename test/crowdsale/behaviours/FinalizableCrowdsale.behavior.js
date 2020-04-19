@@ -25,6 +25,14 @@ function shouldBehaveLikeFinalizableCrowdsale ([other]) {
     const { logs } = await this.crowdsale.finalize({ from: other });
     expectEvent.inLogs(logs, 'CrowdsaleFinalized');
   });
+
+  describe('once finalized', function () {
+    it('finalized should be true', async function () {
+      await time.increaseTo(this.afterClosingTime);
+      await this.crowdsale.finalize({ from: other });
+      (await this.crowdsale.finalized()).should.be.equal(true);
+    });
+  });
 }
 
 module.exports = {

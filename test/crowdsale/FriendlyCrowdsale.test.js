@@ -266,6 +266,10 @@ contract('FriendlyCrowdsale', function ([owner, wallet, investor, purchaser, fee
         (await this.crowdsale.feePerMille()).should.be.bignumber.equal(this.feePerMille);
       });
 
+      it('finalized should be false', async function () {
+        (await this.crowdsale.finalized()).should.be.equal(false);
+      });
+
       context('test FriendlyCrowdale behavior', function () {
         shouldBehaveLikeFriendlyCrowdsale([owner, wallet, investor, purchaser, feeWallet, other]);
       });
