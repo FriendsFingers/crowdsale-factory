@@ -15,6 +15,8 @@ import "../access/Roles.sol";
 contract FriendlyCrowdsale is Context, ReentrancyGuard, Roles {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
+    using EnumerableSet for EnumerableSet.AddressSet;
+    using Address for address;
 
     // The token being sold
     IERC20 private _token;
@@ -53,22 +55,16 @@ contract FriendlyCrowdsale is Context, ReentrancyGuard, Roles {
     uint256 private _feePerMille;
 
     // List of addresses who contributed in crowdsales
-    address[] private _investors;
+    EnumerableSet.AddressSet private _investors;
+
+    // Map of investors deposit
+    mapping(address => uint256) private _deposits;
 
     // Crowdsale status list
     enum State { Review, Active, Refunding, Closed, Expired, Rejected }
 
     // Crowdsale current state
     State private _state;
-
-    // Escrow status
-    struct Escrow {
-        bool exists;
-        uint256 deposit;
-    }
-
-    // Map of investors
-    mapping(address => Escrow) private _escrowList;
 
     /**
      * Event for token purchase logging
@@ -288,7 +284,7 @@ contract FriendlyCrowdsale is Context, ReentrancyGuard, Roles {
      * @return uint representing investors number
      */
     function investorsNumber() public view returns (uint) {
-        return _investors.length;
+        return _investors.length();
     }
 
     /**
@@ -297,7 +293,7 @@ contract FriendlyCrowdsale is Context, ReentrancyGuard, Roles {
      * @return bool
      */
     function investorExists(address account) public view returns (bool) {
-        return _escrowList[account].exists;
+        return _investors.contains(account);
     }
 
     /**
@@ -306,7 +302,7 @@ contract FriendlyCrowdsale is Context, ReentrancyGuard, Roles {
      * @return address of an investor by list index
      */
     function getInvestorAddress(uint index) public view returns (address) {
-        return _investors[index];
+        return _investors.at(index);
     }
 
     /**
@@ -315,7 +311,7 @@ contract FriendlyCrowdsale is Context, ReentrancyGuard, Roles {
      * @return uint256
      */
     function weiContribution(address account) public view returns (uint256) {
-        return _escrowList[account].deposit;
+        return _deposits[account];
     }
 
     /**
@@ -388,9 +384,9 @@ contract FriendlyCrowdsale is Context, ReentrancyGuard, Roles {
         require(_state == State.Refunding, "FriendlyCrowdsale: not refunding");
         require(weiContribution(refundee) > 0, "FriendlyCrowdsale: no deposit");
 
-        uint256 payment = _escrowList[refundee].deposit;
+        uint256 payment = _deposits[refundee];
 
-        _escrowList[refundee].deposit = 0;
+        _deposits[refundee] = 0;
 
         refundee.transfer(payment);
 
@@ -461,11 +457,10 @@ contract FriendlyCrowdsale is Context, ReentrancyGuard, Roles {
      */
     function _updatePurchasingState(address beneficiary, uint256 weiAmount) internal {
         if (!investorExists(beneficiary)) {
-            _investors.push(beneficiary);
-            _escrowList[beneficiary].exists = true;
+            _investors.add(beneficiary);
         }
 
-        _escrowList[beneficiary].deposit = _escrowList[beneficiary].deposit.add(weiAmount);
+        _deposits[beneficiary] = _deposits[beneficiary].add(weiAmount);
     }
 
     /**
