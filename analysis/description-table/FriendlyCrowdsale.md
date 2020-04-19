@@ -5,7 +5,7 @@
 
 |  File Name  |  SHA-1 Hash  |
 |-------------|--------------|
-| dist/FriendlyCrowdsale.dist.sol | 23659f27196a26232a25617770746dbbeff74bda |
+| dist/FriendlyCrowdsale.dist.sol | e213b621604f4793507ae849dbbc70ad395f6a8f |
 
 
 ### Contracts Description Table
@@ -14,19 +14,6 @@
 |  Contract  |         Type        |       Bases      |                  |                 |
 |:----------:|:-------------------:|:----------------:|:----------------:|:---------------:|
 |     └      |  **Function Name**  |  **Visibility**  |  **Mutability**  |  **Modifiers**  |
-||||||
-| **Context** | Implementation |  |||
-| └ | <Constructor> | Internal 🔒 | 🛑  | |
-| └ | _msgSender | Internal 🔒 |   | |
-| └ | _msgData | Internal 🔒 |   | |
-||||||
-| **IERC20** | Interface |  |||
-| └ | totalSupply | External ❗️ |   |NO❗️ |
-| └ | balanceOf | External ❗️ |   |NO❗️ |
-| └ | transfer | External ❗️ | 🛑  |NO❗️ |
-| └ | allowance | External ❗️ |   |NO❗️ |
-| └ | approve | External ❗️ | 🛑  |NO❗️ |
-| └ | transferFrom | External ❗️ | 🛑  |NO❗️ |
 ||||||
 | **SafeMath** | Library |  |||
 | └ | add | Internal 🔒 |   | |
@@ -37,6 +24,14 @@
 | └ | div | Internal 🔒 |   | |
 | └ | mod | Internal 🔒 |   | |
 | └ | mod | Internal 🔒 |   | |
+||||||
+| **IERC20** | Interface |  |||
+| └ | totalSupply | External ❗️ |   |NO❗️ |
+| └ | balanceOf | External ❗️ |   |NO❗️ |
+| └ | transfer | External ❗️ | 🛑  |NO❗️ |
+| └ | allowance | External ❗️ |   |NO❗️ |
+| └ | approve | External ❗️ | 🛑  |NO❗️ |
+| └ | transferFrom | External ❗️ | 🛑  |NO❗️ |
 ||||||
 | **Address** | Library |  |||
 | └ | isContract | Internal 🔒 |   | |
@@ -49,6 +44,11 @@
 | └ | safeIncreaseAllowance | Internal 🔒 | 🛑  | |
 | └ | safeDecreaseAllowance | Internal 🔒 | 🛑  | |
 | └ | _callOptionalReturn | Private 🔐 | 🛑  | |
+||||||
+| **Context** | Implementation |  |||
+| └ | <Constructor> | Internal 🔒 | 🛑  | |
+| └ | _msgSender | Internal 🔒 |   | |
+| └ | _msgData | Internal 🔒 |   | |
 ||||||
 | **ReentrancyGuard** | Implementation |  |||
 | └ | <Constructor> | Internal 🔒 | 🛑  | |
@@ -89,23 +89,23 @@
 | **FriendlyCrowdsale** | Implementation | Context, ReentrancyGuard, Roles |||
 | └ | <Constructor> | Public ❗️ | 🛑  |NO❗️ |
 | └ | <Receive Ether> | External ❗️ |  💵 |NO❗️ |
-| └ | token | Public ❗️ |   |NO❗️ |
-| └ | wallet | Public ❗️ |   |NO❗️ |
-| └ | rate | Public ❗️ |   |NO❗️ |
-| └ | weiRaised | Public ❗️ |   |NO❗️ |
-| └ | cap | Public ❗️ |   |NO❗️ |
+| └ | token | External ❗️ |   |NO❗️ |
+| └ | wallet | External ❗️ |   |NO❗️ |
+| └ | rate | External ❗️ |   |NO❗️ |
+| └ | weiRaised | External ❗️ |   |NO❗️ |
+| └ | cap | External ❗️ |   |NO❗️ |
+| └ | openingTime | External ❗️ |   |NO❗️ |
+| └ | closingTime | External ❗️ |   |NO❗️ |
+| └ | finalized | External ❗️ |   |NO❗️ |
+| └ | feeWallet | External ❗️ |   |NO❗️ |
+| └ | feePerMille | External ❗️ |   |NO❗️ |
+| └ | goal | External ❗️ |   |NO❗️ |
+| └ | state | External ❗️ |   |NO❗️ |
 | └ | capReached | Public ❗️ |   |NO❗️ |
-| └ | openingTime | Public ❗️ |   |NO❗️ |
-| └ | closingTime | Public ❗️ |   |NO❗️ |
-| └ | isOpen | Public ❗️ |   |NO❗️ |
 | └ | hasClosed | Public ❗️ |   |NO❗️ |
-| └ | finalized | Public ❗️ |   |NO❗️ |
-| └ | feeWallet | Public ❗️ |   |NO❗️ |
-| └ | feePerMille | Public ❗️ |   |NO❗️ |
-| └ | goal | Public ❗️ |   |NO❗️ |
-| └ | state | Public ❗️ |   |NO❗️ |
 | └ | started | Public ❗️ |   |NO❗️ |
 | └ | ended | Public ❗️ |   |NO❗️ |
+| └ | isOpen | Public ❗️ |   |NO❗️ |
 | └ | goalReached | Public ❗️ |   |NO❗️ |
 | └ | investorsNumber | Public ❗️ |   |NO❗️ |
 | └ | investorExists | Public ❗️ |   |NO❗️ |
