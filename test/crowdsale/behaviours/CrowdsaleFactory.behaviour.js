@@ -1,4 +1,4 @@
-const { expectEvent } = require('@openzeppelin/test-helpers');
+const { BN, expectEvent } = require('@openzeppelin/test-helpers');
 
 const { shouldBehaveLikeTokenRecover } = require('eth-token-recover/test/TokenRecover.behaviour');
 
@@ -67,6 +67,49 @@ function shouldBehaveLikeCrowdsaleFactory ([owner, wallet, investor, purchaser, 
 
       it('feePerMille should be right set', async function () {
         (await this.crowdsale.feePerMille()).should.be.bignumber.equal(this.feePerMille);
+      });
+
+      it('should increase crowdsales number', async function () {
+        expect(await this.factory.crowdsalesNumber()).to.be.bignumber.equal(new BN(1));
+      });
+
+      it('should say crowdsale exists', async function () {
+        expect(await this.factory.crowdsaleExists(this.crowdsale.address)).to.be.equal(true);
+      });
+
+      it('should get crowdsales address by index', async function () {
+        expect(await this.factory.getCrowdsaleAddress(0)).to.be.equal(this.crowdsale.address);
+      });
+
+      context('creating another crowdsale', function () {
+        beforeEach(async function () {
+          this.trx = await this.factory.createCrowdsale(
+            this.openingTime,
+            this.closingTime,
+            this.cap,
+            this.goal,
+            this.rate,
+            wallet,
+            this.token.address,
+            { from: owner },
+          );
+
+          const event = this.trx.logs.find(e => e.event === 'CrowdsaleCreated');
+
+          this.otherCrowdsale = await FriendlyCrowdsale.at(event.args.crowdsale);
+        });
+
+        it('should increase crowdsales number', async function () {
+          expect(await this.factory.crowdsalesNumber()).to.be.bignumber.equal(new BN(2));
+        });
+
+        it('should say crowdsale exists', async function () {
+          expect(await this.factory.crowdsaleExists(this.otherCrowdsale.address)).to.be.equal(true);
+        });
+
+        it('should get crowdsales address by index', async function () {
+          expect(await this.factory.getCrowdsaleAddress(1)).to.be.equal(this.otherCrowdsale.address);
+        });
       });
     });
   });
