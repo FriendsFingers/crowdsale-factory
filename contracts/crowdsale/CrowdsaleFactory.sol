@@ -5,13 +5,13 @@ import "./FriendlyCrowdsale.sol";
 
 contract CrowdsaleFactory is Roles, TokenRecover {
 
-    event CrowdsaleCreated(address crowdsale);
-
     // address where fee are collected
     address payable private _feeWallet;
 
     // per mille rate fee
     uint256 private _feePerMille;
+
+    event CrowdsaleCreated(address crowdsale);
 
     /**
      * @param feeWallet Address of the fee wallet
@@ -27,14 +27,14 @@ contract CrowdsaleFactory is Roles, TokenRecover {
     /**
      * @return address where fee are collected.
      */
-    function feeWallet() public view returns (address) {
+    function feeWallet() external view returns (address) {
         return _feeWallet;
     }
 
     /**
      * @return the per mille rate fee.
      */
-    function feePerMille() public view returns (uint256) {
+    function feePerMille() external view returns (uint256) {
         return _feePerMille;
     }
 
@@ -47,7 +47,7 @@ contract CrowdsaleFactory is Roles, TokenRecover {
         address payable wallet,
         IERC20 token
     )
-        public
+        external
     {
         FriendlyCrowdsale crowdsale = new FriendlyCrowdsale(
             openingTime,

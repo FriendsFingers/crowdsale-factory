@@ -1,9 +1,8 @@
 pragma solidity ^0.6.6;
 
-import "@openzeppelin/contracts/GSN/Context.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
+import "@openzeppelin/contracts/GSN/Context.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "../access/Roles.sol";
 
@@ -41,17 +40,35 @@ contract FriendlyCrowdsale is Context, ReentrancyGuard, Roles {
     // Crowdsale closing time
     uint256 private _closingTime;
 
+    // Minimum amount of funds to be raised in weis
+    uint256 private _goal;
+
     // If the Crowdsale is finalized or not
     bool private _finalized;
 
+    // Address where fee are collected
+    address payable private _feeWallet;
+
+    // Per mille rate fee
+    uint256 private _feePerMille;
+
+    // List of addresses who contributed in crowdsales
+    address[] private _investors;
+
     // Crowdsale status list
     enum State { Review, Active, Refunding, Closed, Expired, Rejected }
+
+    // Crowdsale current state
+    State private _state;
 
     // Escrow status
     struct Escrow {
         bool exists;
         uint256 deposit;
     }
+
+    // Map of investors
+    mapping(address => Escrow) private _escrowList;
 
     /**
      * Event for token purchase logging
@@ -70,24 +87,6 @@ contract FriendlyCrowdsale is Context, ReentrancyGuard, Roles {
     event RefundsEnabled();
     event Expired();
     event Withdrawn(address indexed refundee, uint256 weiAmount);
-
-    // Crowdsale current state
-    State private _state;
-
-    // Address where fee are collected
-    address payable private _feeWallet;
-
-    // Per mille rate fee
-    uint256 private _feePerMille;
-
-    // List of addresses who contributed in crowdsales
-    address[] private _investors;
-
-    // Map of investors
-    mapping(address => Escrow) private _escrowList;
-
-    // Minimum amount of funds to be raised in weis
-    uint256 private _goal;
 
     /**
      * @param openingTime Crowdsale opening time
@@ -135,9 +134,9 @@ contract FriendlyCrowdsale is Context, ReentrancyGuard, Roles {
         _openingTime = openingTime;
         _closingTime = closingTime;
 
+        _goal = goal;
         _finalized = false;
 
-        _goal = goal;
         _feeWallet = feeWallet;
         _feePerMille = feePerMille;
 
@@ -157,36 +156,85 @@ contract FriendlyCrowdsale is Context, ReentrancyGuard, Roles {
     /**
      * @return the token being sold.
      */
-    function token() public view returns (IERC20) {
+    function token() external view returns (IERC20) {
         return _token;
     }
 
     /**
      * @return the address where funds are collected.
      */
-    function wallet() public view returns (address payable) {
+    function wallet() external view returns (address payable) {
         return _wallet;
     }
 
     /**
      * @return the number of token units a buyer gets per wei.
      */
-    function rate() public view returns (uint256) {
+    function rate() external view returns (uint256) {
         return _rate;
     }
 
     /**
      * @return the amount of wei raised.
      */
-    function weiRaised() public view returns (uint256) {
+    function weiRaised() external view returns (uint256) {
         return _weiRaised;
     }
 
     /**
      * @return the cap of the crowdsale.
      */
-    function cap() public view returns (uint256) {
+    function cap() external view returns (uint256) {
         return _cap;
+    }
+
+    /**
+     * @return the crowdsale opening time.
+     */
+    function openingTime() external view returns (uint256) {
+        return _openingTime;
+    }
+
+    /**
+     * @return the crowdsale closing time.
+     */
+    function closingTime() external view returns (uint256) {
+        return _closingTime;
+    }
+
+    /**
+     * @return true if the crowdsale is finalized, false otherwise.
+     */
+    function finalized() external view returns (bool) {
+        return _finalized;
+    }
+
+    /**
+     * @return address where fee are collected.
+     */
+    function feeWallet() external view returns (address payable) {
+        return _feeWallet;
+    }
+
+    /**
+     * @return the per mille rate fee.
+     */
+    function feePerMille() external view returns (uint256) {
+        return _feePerMille;
+    }
+
+    /**
+     * @return minimum amount of funds to be raised in wei.
+     */
+    function goal() external view returns (uint256) {
+        return _goal;
+    }
+
+    /**
+     * @return The current state of the escrow.
+     */
+    function state() external view returns (State) {
+        return _state;
     }
 
     /**
@@ -194,29 +242,7 @@ contract FriendlyCrowdsale is Context, ReentrancyGuard, Roles {
      * @return Whether the cap was reached
      */
     function capReached() public view returns (bool) {
-        return weiRaised() >= _cap;
-    }
-
-    /**
-     * @return the crowdsale opening time.
-     */
-    function openingTime() public view returns (uint256) {
-        return _openingTime;
-    }
-
-    /**
-     * @return the crowdsale closing time.
-     */
-    function closingTime() public view returns (uint256) {
-        return _closingTime;
-    }
-
-    /**
-     * @return true if the crowdsale is open, false otherwise.
-     */
-    function isOpen() public view returns (bool) {
-        // solhint-disable-next-line not-rely-on-time
-        return block.timestamp >= _openingTime && block.timestamp <= _closingTime;
+        return _weiRaised >= _cap;
     }
 
     /**
@@ -229,45 +255,10 @@ contract FriendlyCrowdsale is Context, ReentrancyGuard, Roles {
     }
 
     /**
-     * @return true if the crowdsale is finalized, false otherwise.
-     */
-    function finalized() public view returns (bool) {
-        return _finalized;
-    }
-
-    /**
-     * @return address where fee are collected.
-     */
-    function feeWallet() public view returns (address payable) {
-        return _feeWallet;
-    }
-
-    /**
-     * @return the per mille rate fee.
-     */
-    function feePerMille() public view returns (uint256) {
-        return _feePerMille;
-    }
-
-    /**
-     * @return minimum amount of funds to be raised in wei.
-     */
-    function goal() public view returns (uint256) {
-        return _goal;
-    }
-
-    /**
-     * @return The current state of the escrow.
-     */
-    function state() public view returns (State) {
-        return _state;
-    }
-
-    /**
      * @return false if the ico is not started, true if the ico is started and running, true if the ico is completed
      */
     function started() public view returns (bool) {
-        return block.timestamp >= openingTime(); // solhint-disable-line not-rely-on-time
+        return block.timestamp >= _openingTime; // solhint-disable-line not-rely-on-time
     }
 
     /**
@@ -278,11 +269,18 @@ contract FriendlyCrowdsale is Context, ReentrancyGuard, Roles {
     }
 
     /**
+     * @return true if the crowdsale is open, false otherwise.
+     */
+    function isOpen() public view returns (bool) {
+        return started() && !hasClosed();
+    }
+
+    /**
      * @dev Checks whether funding goal was reached.
      * @return Whether funding goal was reached
      */
     function goalReached() public view returns (bool) {
-        return weiRaised() >= _goal;
+        return _weiRaised >= _goal;
     }
 
     /**
@@ -386,7 +384,7 @@ contract FriendlyCrowdsale is Context, ReentrancyGuard, Roles {
      * @param refundee Whose refund will be claimed.
      */
     function claimRefund(address payable refundee) public {
-        require(finalized(), "FriendlyCrowdsale: not finalized");
+        require(_finalized, "FriendlyCrowdsale: not finalized");
         require(_state == State.Refunding, "FriendlyCrowdsale: not refunding");
         require(weiContribution(refundee) > 0, "FriendlyCrowdsale: no deposit");
 
@@ -404,7 +402,7 @@ contract FriendlyCrowdsale is Context, ReentrancyGuard, Roles {
      */
     function setExpiredAndWithdraw() public onlyOperator {
         // solhint-disable-next-line not-rely-on-time
-        require(block.timestamp >= closingTime() + 365 days, "FriendlyCrowdsale: not expired");
+        require(block.timestamp >= _closingTime + 365 days, "FriendlyCrowdsale: not expired");
         _state = State.Expired;
 
         _feeWallet.transfer(address(this).balance);
@@ -421,7 +419,7 @@ contract FriendlyCrowdsale is Context, ReentrancyGuard, Roles {
     function _preValidatePurchase(address beneficiary, uint256 weiAmount) internal view {
         require(beneficiary != address(0), "Crowdsale: beneficiary is the zero address");
         require(weiAmount != 0, "Crowdsale: weiAmount is 0");
-        require(weiRaised().add(weiAmount) <= _cap, "CappedCrowdsale: cap exceeded");
+        require(_weiRaised.add(weiAmount) <= _cap, "CappedCrowdsale: cap exceeded");
         require(isOpen(), "TimedCrowdsale: not open");
 
         require(_state == State.Active, "FriendlyCrowdsale: not active");
@@ -509,7 +507,7 @@ contract FriendlyCrowdsale is Context, ReentrancyGuard, Roles {
 
         _feeWallet.transfer(address(this).balance.mul(_feePerMille).div(1000));
 
-        wallet().transfer(address(this).balance);
+        _wallet.transfer(address(this).balance);
 
         emit RefundsClosed();
     }
@@ -526,8 +524,8 @@ contract FriendlyCrowdsale is Context, ReentrancyGuard, Roles {
      * @dev Recover remaining tokens to wallet.
      */
     function _recoverRemainingTokens() internal {
-        if (token().balanceOf(address(this)) > 0) {
-            token().transfer(wallet(), token().balanceOf(address(this)));
+        if (_token.balanceOf(address(this)) > 0) {
+            _token.safeTransfer(_wallet, _token.balanceOf(address(this)));
         }
     }
 }
