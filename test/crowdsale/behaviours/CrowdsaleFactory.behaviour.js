@@ -70,7 +70,7 @@ function shouldBehaveLikeCrowdsaleFactory ([owner, wallet, investor, purchaser, 
       });
 
       it('should increase crowdsales number', async function () {
-        expect(await this.factory.crowdsalesNumber()).to.be.bignumber.equal(new BN(1));
+        (await this.factory.crowdsalesNumber()).should.be.bignumber.equal(new BN(1));
       });
 
       it('should say crowdsale exists', async function () {
@@ -100,7 +100,7 @@ function shouldBehaveLikeCrowdsaleFactory ([owner, wallet, investor, purchaser, 
         });
 
         it('should increase crowdsales number', async function () {
-          expect(await this.factory.crowdsalesNumber()).to.be.bignumber.equal(new BN(2));
+          (await this.factory.crowdsalesNumber()).should.be.bignumber.equal(new BN(2));
         });
 
         it('should say crowdsale exists', async function () {
