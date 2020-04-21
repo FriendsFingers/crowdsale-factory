@@ -157,8 +157,7 @@ library SafeMath {
 pragma solidity ^0.6.0;
 
 /**
- * @dev Interface of the ERC20 standard as defined in the EIP. Does not include
- * the optional functions; to access them see {ERC20Detailed}.
+ * @dev Interface of the ERC20 standard as defined in the EIP.
  */
 interface IERC20 {
     /**
@@ -233,7 +232,7 @@ interface IERC20 {
 
 // File: @openzeppelin/contracts/utils/Address.sol
 
-pragma solidity ^0.6.0;
+pragma solidity ^0.6.2;
 
 /**
  * @dev Collection of functions related to the address type
@@ -287,7 +286,7 @@ library Address {
         require(address(this).balance >= amount, "Address: insufficient balance");
 
         // solhint-disable-next-line avoid-low-level-calls, avoid-call-value
-        (bool success, ) = recipient.call.value(amount)("");
+        (bool success, ) = recipient.call{ value: amount }("");
         require(success, "Address: unable to send value, recipient may have reverted");
     }
 }
@@ -468,11 +467,18 @@ pragma solidity ^0.6.0;
  * (O(1)).
  * - Elements are enumerated in O(n). No guarantees are made on the ordering.
  *
- * As of v2.5.0, only `address` sets are supported.
+ * ```
+ * contract Example {
+ *     // Add the library methods
+ *     using EnumerableSet for EnumerableSet.AddressSet;
  *
- * Include with `using EnumerableSet for EnumerableSet.AddressSet;`.
+ *     // Declare a set state variable
+ *     EnumerableSet.AddressSet private mySet;
+ * }
+ * ```
  *
- * @author Alberto Cuesta Cañada
+ * As of v3.0.0, only sets of type `address` (`AddressSet`) and `uint256`
+ * (`UintSet`) are supported.
  */
 library EnumerableSet {
     // To implement this library for multiple types with as little code
@@ -721,7 +727,7 @@ pragma solidity ^0.6.0;
  *
  * Roles can be granted and revoked dynamically via the {grantRole} and
  * {revokeRole} functions. Each role has an associated admin role, and only
- * accounts that have a role's admin role can call {grantRole} and {revokeRoke}.
+ * accounts that have a role's admin role can call {grantRole} and {revokeRole}.
  *
  * By default, the admin role for all roles is `DEFAULT_ADMIN_ROLE`, which means
  * that only accounts with this role will be able to grant or revoke other
@@ -807,7 +813,7 @@ abstract contract AccessControl is Context {
      *
      * Requirements:
      *
-     * - the caller must have `role`'s admin role.
+     * - the caller must have ``role``'s admin role.
      */
     function grantRole(bytes32 role, address account) public virtual {
         require(hasRole(_roles[role].adminRole, _msgSender()), "AccessControl: sender must be an admin to grant");
@@ -822,7 +828,7 @@ abstract contract AccessControl is Context {
      *
      * Requirements:
      *
-     * - the caller must have `role`'s admin role.
+     * - the caller must have ``role``'s admin role.
      */
     function revokeRole(bytes32 role, address account) public virtual {
         require(hasRole(_roles[role].adminRole, _msgSender()), "AccessControl: sender must be an admin to revoke");
@@ -857,17 +863,21 @@ abstract contract AccessControl is Context {
      * event. Note that unlike {grantRole}, this function doesn't perform any
      * checks on the calling account.
      *
-     * Requirements:
+     * [WARNING]
+     * ====
+     * This function should only be called from the constructor when setting
+     * up the initial roles for the system.
      *
-     * - this function can only be called from a constructor.
+     * Using this function in any other way is effectively circumventing the admin
+     * system imposed by {AccessControl}.
+     * ====
      */
     function _setupRole(bytes32 role, address account) internal virtual {
-        require(!address(this).isContract(), "AccessControl: roles cannot be setup after construction");
         _grantRole(role, account);
     }
 
     /**
-     * @dev Sets `adminRole` as `role`'s admin role.
+     * @dev Sets `adminRole` as ``role``'s admin role.
      */
     function _setRoleAdmin(bytes32 role, bytes32 adminRole) internal virtual {
         _roles[role].adminRole = adminRole;

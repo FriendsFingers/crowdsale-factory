@@ -16,15 +16,6 @@ contract('Roles', function ([_, owner, ...otherAccounts]) {
     const ROLE = web3.utils.soliditySha3(roleName);
     const OTHER_ROLE = web3.utils.soliditySha3('OTHER_ROLE');
 
-    describe('_setupRole', function () {
-      it('cannot be called outside the constructor', async function () {
-        await expectRevert(
-          this.contract.setupRole(OTHER_ROLE, other),
-          'AccessControl: roles cannot be setup after construction',
-        );
-      });
-    });
-
     describe('default admin', function () {
       it('deployer has default admin role', async function () {
         expect(await this.contract.hasRole(DEFAULT_ADMIN_ROLE, admin)).to.equal(true);
