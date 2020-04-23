@@ -82,6 +82,6 @@
   },
   "dependencies": {
     "@openzeppelin/contracts": "3.0.0",
-    "eth-token-recover": "3.0.0"
+    "eth-token-recover": "3.0.1"
   }
 }
