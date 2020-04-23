@@ -29,7 +29,7 @@ contract('CrowdsaleFactory', function ([owner, wallet, investor, purchaser, feeW
 
     this.maxTokenSupply = this.cap.mul(this.rate);
 
-    this.token = await ERC20Mock.new(owner, this.maxTokenSupply, { from: owner });
+    this.token = await ERC20Mock.new('TEST', 'TEST', owner, this.maxTokenSupply, { from: owner });
   });
 
   context('like a CrowdsaleFactory', function () {

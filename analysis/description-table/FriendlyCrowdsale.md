@@ -5,7 +5,7 @@
 
 |  File Name  |  SHA-1 Hash  |
 |-------------|--------------|
-| dist/FriendlyCrowdsale.dist.sol | 949789363498a2c6c7857dc60806bbf49a9d53e5 |
+| dist/FriendlyCrowdsale.dist.sol | e213b621604f4793507ae849dbbc70ad395f6a8f |
 
 
 ### Contracts Description Table
@@ -25,11 +25,6 @@
 | └ | mod | Internal 🔒 |   | |
 | └ | mod | Internal 🔒 |   | |
 ||||||
-| **Context** | Implementation |  |||
-| └ | <Constructor> | Internal 🔒 | 🛑  | |
-| └ | _msgSender | Internal 🔒 |   | |
-| └ | _msgData | Internal 🔒 |   | |
-||||||
 | **IERC20** | Interface |  |||
 | └ | totalSupply | External ❗️ |   |NO❗️ |
 | └ | balanceOf | External ❗️ |   |NO❗️ |
@@ -40,7 +35,6 @@
 ||||||
 | **Address** | Library |  |||
 | └ | isContract | Internal 🔒 |   | |
-| └ | toPayable | Internal 🔒 |   | |
 | └ | sendValue | Internal 🔒 | 🛑  | |
 ||||||
 | **SafeERC20** | Library |  |||
@@ -49,80 +43,86 @@
 | └ | safeApprove | Internal 🔒 | 🛑  | |
 | └ | safeIncreaseAllowance | Internal 🔒 | 🛑  | |
 | └ | safeDecreaseAllowance | Internal 🔒 | 🛑  | |
-| └ | callOptionalReturn | Private 🔐 | 🛑  | |
+| └ | _callOptionalReturn | Private 🔐 | 🛑  | |
+||||||
+| **Context** | Implementation |  |||
+| └ | <Constructor> | Internal 🔒 | 🛑  | |
+| └ | _msgSender | Internal 🔒 |   | |
+| └ | _msgData | Internal 🔒 |   | |
 ||||||
 | **ReentrancyGuard** | Implementation |  |||
 | └ | <Constructor> | Internal 🔒 | 🛑  | |
 ||||||
-| **Crowdsale** | Implementation | Context, ReentrancyGuard |||
+| **EnumerableSet** | Library |  |||
+| └ | _add | Private 🔐 | 🛑  | |
+| └ | _remove | Private 🔐 | 🛑  | |
+| └ | _contains | Private 🔐 |   | |
+| └ | _length | Private 🔐 |   | |
+| └ | _at | Private 🔐 |   | |
+| └ | add | Internal 🔒 | 🛑  | |
+| └ | remove | Internal 🔒 | 🛑  | |
+| └ | contains | Internal 🔒 |   | |
+| └ | length | Internal 🔒 |   | |
+| └ | at | Internal 🔒 |   | |
+| └ | add | Internal 🔒 | 🛑  | |
+| └ | remove | Internal 🔒 | 🛑  | |
+| └ | contains | Internal 🔒 |   | |
+| └ | length | Internal 🔒 |   | |
+| └ | at | Internal 🔒 |   | |
+||||||
+| **AccessControl** | Implementation | Context |||
+| └ | hasRole | Public ❗️ |   |NO❗️ |
+| └ | getRoleMemberCount | Public ❗️ |   |NO❗️ |
+| └ | getRoleMember | Public ❗️ |   |NO❗️ |
+| └ | getRoleAdmin | Public ❗️ |   |NO❗️ |
+| └ | grantRole | Public ❗️ | 🛑  |NO❗️ |
+| └ | revokeRole | Public ❗️ | 🛑  |NO❗️ |
+| └ | renounceRole | Public ❗️ | 🛑  |NO❗️ |
+| └ | _setupRole | Internal 🔒 | 🛑  | |
+| └ | _setRoleAdmin | Internal 🔒 | 🛑  | |
+| └ | _grantRole | Private 🔐 | 🛑  | |
+| └ | _revokeRole | Private 🔐 | 🛑  | |
+||||||
+| **Roles** | Implementation | AccessControl |||
 | └ | <Constructor> | Public ❗️ | 🛑  |NO❗️ |
-| └ | <Fallback> | External ❗️ |  💵 |NO❗️ |
-| └ | token | Public ❗️ |   |NO❗️ |
-| └ | wallet | Public ❗️ |   |NO❗️ |
-| └ | rate | Public ❗️ |   |NO❗️ |
-| └ | weiRaised | Public ❗️ |   |NO❗️ |
+||||||
+| **FriendlyCrowdsale** | Implementation | Context, ReentrancyGuard, Roles |||
+| └ | <Constructor> | Public ❗️ | 🛑  |NO❗️ |
+| └ | <Receive Ether> | External ❗️ |  💵 |NO❗️ |
+| └ | token | External ❗️ |   |NO❗️ |
+| └ | wallet | External ❗️ |   |NO❗️ |
+| └ | rate | External ❗️ |   |NO❗️ |
+| └ | weiRaised | External ❗️ |   |NO❗️ |
+| └ | cap | External ❗️ |   |NO❗️ |
+| └ | openingTime | External ❗️ |   |NO❗️ |
+| └ | closingTime | External ❗️ |   |NO❗️ |
+| └ | finalized | External ❗️ |   |NO❗️ |
+| └ | feeWallet | External ❗️ |   |NO❗️ |
+| └ | feePerMille | External ❗️ |   |NO❗️ |
+| └ | goal | External ❗️ |   |NO❗️ |
+| └ | state | External ❗️ |   |NO❗️ |
+| └ | capReached | Public ❗️ |   |NO❗️ |
+| └ | hasClosed | Public ❗️ |   |NO❗️ |
+| └ | started | Public ❗️ |   |NO❗️ |
+| └ | ended | Public ❗️ |   |NO❗️ |
+| └ | isOpen | Public ❗️ |   |NO❗️ |
+| └ | goalReached | Public ❗️ |   |NO❗️ |
+| └ | investorsNumber | Public ❗️ |   |NO❗️ |
+| └ | investorExists | Public ❗️ |   |NO❗️ |
+| └ | getInvestorAddress | Public ❗️ |   |NO❗️ |
+| └ | weiContribution | Public ❗️ |   |NO❗️ |
 | └ | buyTokens | Public ❗️ |  💵 | nonReentrant |
+| └ | enable | Public ❗️ | 🛑  | onlyOperator |
+| └ | reject | Public ❗️ | 🛑  | onlyOperator |
+| └ | finalize | Public ❗️ | 🛑  |NO❗️ |
+| └ | claimRefund | Public ❗️ | 🛑  |NO❗️ |
+| └ | setExpiredAndWithdraw | Public ❗️ | 🛑  | onlyOperator |
 | └ | _preValidatePurchase | Internal 🔒 |   | |
 | └ | _postValidatePurchase | Internal 🔒 |   | |
 | └ | _deliverTokens | Internal 🔒 | 🛑  | |
 | └ | _processPurchase | Internal 🔒 | 🛑  | |
 | └ | _updatePurchasingState | Internal 🔒 | 🛑  | |
 | └ | _getTokenAmount | Internal 🔒 |   | |
-| └ | _forwardFunds | Internal 🔒 | 🛑  | |
-||||||
-| **TimedCrowdsale** | Implementation | Crowdsale |||
-| └ | <Constructor> | Public ❗️ | 🛑  |NO❗️ |
-| └ | openingTime | Public ❗️ |   |NO❗️ |
-| └ | closingTime | Public ❗️ |   |NO❗️ |
-| └ | isOpen | Public ❗️ |   |NO❗️ |
-| └ | hasClosed | Public ❗️ |   |NO❗️ |
-| └ | _preValidatePurchase | Internal 🔒 |   | onlyWhileOpen |
-| └ | _extendTime | Internal 🔒 | 🛑  | |
-||||||
-| **FinalizableCrowdsale** | Implementation | TimedCrowdsale |||
-| └ | <Constructor> | Internal 🔒 | 🛑  | |
-| └ | finalized | Public ❗️ |   |NO❗️ |
-| └ | finalize | Public ❗️ | 🛑  |NO❗️ |
-| └ | _finalization | Internal 🔒 | 🛑  | |
-||||||
-| **CappedCrowdsale** | Implementation | Crowdsale |||
-| └ | <Constructor> | Public ❗️ | 🛑  |NO❗️ |
-| └ | cap | Public ❗️ |   |NO❗️ |
-| └ | capReached | Public ❗️ |   |NO❗️ |
-| └ | _preValidatePurchase | Internal 🔒 |   | |
-||||||
-| **Roles** | Library |  |||
-| └ | add | Internal 🔒 | 🛑  | |
-| └ | remove | Internal 🔒 | 🛑  | |
-| └ | has | Internal 🔒 |   | |
-||||||
-| **OperatorRole** | Implementation |  |||
-| └ | <Constructor> | Internal 🔒 | 🛑  | |
-| └ | isOperator | Public ❗️ |   |NO❗️ |
-| └ | addOperator | Public ❗️ | 🛑  | onlyOperator |
-| └ | renounceOperator | Public ❗️ | 🛑  |NO❗️ |
-| └ | _addOperator | Internal 🔒 | 🛑  | |
-| └ | _removeOperator | Internal 🔒 | 🛑  | |
-||||||
-| **FriendlyCrowdsale** | Implementation | FinalizableCrowdsale, CappedCrowdsale, OperatorRole |||
-| └ | <Constructor> | Public ❗️ | 🛑  | Crowdsale TimedCrowdsale CappedCrowdsale |
-| └ | feeWallet | Public ❗️ |   |NO❗️ |
-| └ | feePerMille | Public ❗️ |   |NO❗️ |
-| └ | goal | Public ❗️ |   |NO❗️ |
-| └ | state | Public ❗️ |   |NO❗️ |
-| └ | started | Public ❗️ |   |NO❗️ |
-| └ | ended | Public ❗️ |   |NO❗️ |
-| └ | goalReached | Public ❗️ |   |NO❗️ |
-| └ | investorsNumber | Public ❗️ |   |NO❗️ |
-| └ | investorExists | Public ❗️ |   |NO❗️ |
-| └ | getInvestorAddress | Public ❗️ |   |NO❗️ |
-| └ | weiContribution | Public ❗️ |   |NO❗️ |
-| └ | enable | Public ❗️ | 🛑  | onlyOperator |
-| └ | reject | Public ❗️ | 🛑  | onlyOperator |
-| └ | claimRefund | Public ❗️ | 🛑  |NO❗️ |
-| └ | setExpiredAndWithdraw | Public ❗️ | 🛑  | onlyOperator |
-| └ | _preValidatePurchase | Internal 🔒 |   | |
-| └ | _updatePurchasingState | Internal 🔒 | 🛑  | |
 | └ | _finalization | Internal 🔒 | 🛑  | |
 | └ | _forwardFunds | Internal 🔒 | 🛑  | |
 | └ | _close | Internal 🔒 | 🛑  | |

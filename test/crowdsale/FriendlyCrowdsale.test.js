@@ -38,7 +38,7 @@ contract('FriendlyCrowdsale', function ([owner, wallet, investor, purchaser, fee
       rejected: new BN(5),
     };
 
-    this.token = await ERC20Mock.new(owner, this.maxTokenSupply, { from: owner });
+    this.token = await ERC20Mock.new('TEST', 'TEST', owner, this.maxTokenSupply, { from: owner });
   });
 
   context('like a FriendlyCrowdsale', function () {
@@ -264,6 +264,10 @@ contract('FriendlyCrowdsale', function ([owner, wallet, investor, purchaser, fee
 
       it('feePerMille should be right set', async function () {
         (await this.crowdsale.feePerMille()).should.be.bignumber.equal(this.feePerMille);
+      });
+
+      it('finalized should be false', async function () {
+        (await this.crowdsale.finalized()).should.be.equal(false);
       });
 
       context('test FriendlyCrowdale behavior', function () {

@@ -1,6 +1,7 @@
-pragma solidity ^0.5.17;
 
 // File: @openzeppelin/contracts/math/SafeMath.sol
+
+pragma solidity ^0.6.0;
 
 /**
  * @dev Wrappers over Solidity's arithmetic operations with added overflow
@@ -53,8 +54,6 @@ library SafeMath {
      *
      * Requirements:
      * - Subtraction cannot overflow.
-     *
-     * _Available since v2.4.0._
      */
     function sub(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
         require(b <= a, errorMessage);
@@ -111,8 +110,6 @@ library SafeMath {
      *
      * Requirements:
      * - The divisor cannot be zero.
-     *
-     * _Available since v2.4.0._
      */
     function div(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
         // Solidity only automatically asserts when dividing by 0
@@ -148,8 +145,6 @@ library SafeMath {
      *
      * Requirements:
      * - The divisor cannot be zero.
-     *
-     * _Available since v2.4.0._
      */
     function mod(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
         require(b != 0, errorMessage);
@@ -157,39 +152,12 @@ library SafeMath {
     }
 }
 
-// File: @openzeppelin/contracts/GSN/Context.sol
-
-/*
- * @dev Provides information about the current execution context, including the
- * sender of the transaction and its data. While these are generally available
- * via msg.sender and msg.data, they should not be accessed in such a direct
- * manner, since when dealing with GSN meta-transactions the account sending and
- * paying for execution may not be the actual sender (as far as an application
- * is concerned).
- *
- * This contract is only required for intermediate, library-like contracts.
- */
-contract Context {
-    // Empty internal constructor, to prevent people from mistakenly deploying
-    // an instance of this contract, which should be used via inheritance.
-    constructor () internal { }
-    // solhint-disable-previous-line no-empty-blocks
-
-    function _msgSender() internal view returns (address payable) {
-        return msg.sender;
-    }
-
-    function _msgData() internal view returns (bytes memory) {
-        this; // silence state mutability warning without generating bytecode - see https://github.com/ethereum/solidity/issues/2691
-        return msg.data;
-    }
-}
-
 // File: @openzeppelin/contracts/token/ERC20/IERC20.sol
 
+pragma solidity ^0.6.0;
+
 /**
- * @dev Interface of the ERC20 standard as defined in the EIP. Does not include
- * the optional functions; to access them see {ERC20Detailed}.
+ * @dev Interface of the ERC20 standard as defined in the EIP.
  */
 interface IERC20 {
     /**
@@ -264,6 +232,8 @@ interface IERC20 {
 
 // File: @openzeppelin/contracts/utils/Address.sol
 
+pragma solidity ^0.6.2;
+
 /**
  * @dev Collection of functions related to the address type
  */
@@ -276,7 +246,7 @@ library Address {
      * It is unsafe to assume that an address for which this function returns
      * false is an externally-owned account (EOA) and not a contract.
      *
-     * Among others, `isContract` will return false for the following 
+     * Among others, `isContract` will return false for the following
      * types of addresses:
      *
      *  - an externally-owned account
@@ -297,16 +267,6 @@ library Address {
     }
 
     /**
-     * @dev Converts an `address` into `address payable`. Note that this is
-     * simply a type cast: the actual underlying value is not changed.
-     *
-     * _Available since v2.4.0._
-     */
-    function toPayable(address account) internal pure returns (address payable) {
-        return address(uint160(account));
-    }
-
-    /**
      * @dev Replacement for Solidity's `transfer`: sends `amount` wei to
      * `recipient`, forwarding all available gas and reverting on errors.
      *
@@ -321,19 +281,22 @@ library Address {
      * taken to not create reentrancy vulnerabilities. Consider using
      * {ReentrancyGuard} or the
      * https://solidity.readthedocs.io/en/v0.5.11/security-considerations.html#use-the-checks-effects-interactions-pattern[checks-effects-interactions pattern].
-     *
-     * _Available since v2.4.0._
      */
     function sendValue(address payable recipient, uint256 amount) internal {
         require(address(this).balance >= amount, "Address: insufficient balance");
 
-        // solhint-disable-next-line avoid-call-value
-        (bool success, ) = recipient.call.value(amount)("");
+        // solhint-disable-next-line avoid-low-level-calls, avoid-call-value
+        (bool success, ) = recipient.call{ value: amount }("");
         require(success, "Address: unable to send value, recipient may have reverted");
     }
 }
 
 // File: @openzeppelin/contracts/token/ERC20/SafeERC20.sol
+
+pragma solidity ^0.6.0;
+
+
+
 
 /**
  * @title SafeERC20
@@ -349,11 +312,11 @@ library SafeERC20 {
     using Address for address;
 
     function safeTransfer(IERC20 token, address to, uint256 value) internal {
-        callOptionalReturn(token, abi.encodeWithSelector(token.transfer.selector, to, value));
+        _callOptionalReturn(token, abi.encodeWithSelector(token.transfer.selector, to, value));
     }
 
     function safeTransferFrom(IERC20 token, address from, address to, uint256 value) internal {
-        callOptionalReturn(token, abi.encodeWithSelector(token.transferFrom.selector, from, to, value));
+        _callOptionalReturn(token, abi.encodeWithSelector(token.transferFrom.selector, from, to, value));
     }
 
     function safeApprove(IERC20 token, address spender, uint256 value) internal {
@@ -364,17 +327,17 @@ library SafeERC20 {
         require((value == 0) || (token.allowance(address(this), spender) == 0),
             "SafeERC20: approve from non-zero to non-zero allowance"
         );
-        callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, spender, value));
+        _callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, spender, value));
     }
 
     function safeIncreaseAllowance(IERC20 token, address spender, uint256 value) internal {
         uint256 newAllowance = token.allowance(address(this), spender).add(value);
-        callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, spender, newAllowance));
+        _callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, spender, newAllowance));
     }
 
     function safeDecreaseAllowance(IERC20 token, address spender, uint256 value) internal {
         uint256 newAllowance = token.allowance(address(this), spender).sub(value, "SafeERC20: decreased allowance below zero");
-        callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, spender, newAllowance));
+        _callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, spender, newAllowance));
     }
 
     /**
@@ -383,7 +346,7 @@ library SafeERC20 {
      * @param token The token targeted by the call.
      * @param data The call data (encoded using abi.encode or one of its variants).
      */
-    function callOptionalReturn(IERC20 token, bytes memory data) private {
+    function _callOptionalReturn(IERC20 token, bytes memory data) private {
         // We need to perform a low level call here, to bypass Solidity's return data size checking mechanism, since
         // we're implementing it ourselves.
 
@@ -405,7 +368,38 @@ library SafeERC20 {
     }
 }
 
+// File: @openzeppelin/contracts/GSN/Context.sol
+
+pragma solidity ^0.6.0;
+
+/*
+ * @dev Provides information about the current execution context, including the
+ * sender of the transaction and its data. While these are generally available
+ * via msg.sender and msg.data, they should not be accessed in such a direct
+ * manner, since when dealing with GSN meta-transactions the account sending and
+ * paying for execution may not be the actual sender (as far as an application
+ * is concerned).
+ *
+ * This contract is only required for intermediate, library-like contracts.
+ */
+contract Context {
+    // Empty internal constructor, to prevent people from mistakenly deploying
+    // an instance of this contract, which should be used via inheritance.
+    constructor () internal { }
+
+    function _msgSender() internal view virtual returns (address payable) {
+        return msg.sender;
+    }
+
+    function _msgData() internal view virtual returns (bytes memory) {
+        this; // silence state mutability warning without generating bytecode - see https://github.com/ethereum/solidity/issues/2691
+        return msg.data;
+    }
+}
+
 // File: @openzeppelin/contracts/utils/ReentrancyGuard.sol
+
+pragma solidity ^0.6.0;
 
 /**
  * @dev Contract module that helps prevent reentrant calls to a function.
@@ -422,9 +416,6 @@ library SafeERC20 {
  * TIP: If you would like to learn more about reentrancy and alternative ways
  * to protect against it, check out our blog post
  * https://blog.openzeppelin.com/reentrancy-after-istanbul/[Reentrancy After Istanbul].
- *
- * _Since v2.5.0:_ this module is now much more gas efficient, given net gas
- * metering changes introduced in the Istanbul hardfork.
  */
 contract ReentrancyGuard {
     bool private _notEntered;
@@ -461,23 +452,490 @@ contract ReentrancyGuard {
     }
 }
 
-// File: @openzeppelin/contracts/crowdsale/Crowdsale.sol
+// File: @openzeppelin/contracts/utils/EnumerableSet.sol
+
+pragma solidity ^0.6.0;
 
 /**
- * @title Crowdsale
- * @dev Crowdsale is a base contract for managing a token crowdsale,
- * allowing investors to purchase tokens with ether. This contract implements
- * such functionality in its most fundamental form and can be extended to provide additional
- * functionality and/or custom behavior.
- * The external interface represents the basic interface for purchasing tokens, and conforms
- * the base architecture for crowdsales. It is *not* intended to be modified / overridden.
- * The internal interface conforms the extensible and modifiable surface of crowdsales. Override
- * the methods to add functionality. Consider using 'super' where appropriate to concatenate
- * behavior.
+ * @dev Library for managing
+ * https://en.wikipedia.org/wiki/Set_(abstract_data_type)[sets] of primitive
+ * types.
+ *
+ * Sets have the following properties:
+ *
+ * - Elements are added, removed, and checked for existence in constant time
+ * (O(1)).
+ * - Elements are enumerated in O(n). No guarantees are made on the ordering.
+ *
+ * ```
+ * contract Example {
+ *     // Add the library methods
+ *     using EnumerableSet for EnumerableSet.AddressSet;
+ *
+ *     // Declare a set state variable
+ *     EnumerableSet.AddressSet private mySet;
+ * }
+ * ```
+ *
+ * As of v3.0.0, only sets of type `address` (`AddressSet`) and `uint256`
+ * (`UintSet`) are supported.
  */
-contract Crowdsale is Context, ReentrancyGuard {
+library EnumerableSet {
+    // To implement this library for multiple types with as little code
+    // repetition as possible, we write it in terms of a generic Set type with
+    // bytes32 values.
+    // The Set implementation uses private functions, and user-facing
+    // implementations (such as AddressSet) are just wrappers around the
+    // underlying Set.
+    // This means that we can only create new EnumerableSets for types that fit
+    // in bytes32.
+
+    struct Set {
+        // Storage of set values
+        bytes32[] _values;
+
+        // Position of the value in the `values` array, plus 1 because index 0
+        // means a value is not in the set.
+        mapping (bytes32 => uint256) _indexes;
+    }
+
+    /**
+     * @dev Add a value to a set. O(1).
+     *
+     * Returns true if the value was added to the set, that is if it was not
+     * already present.
+     */
+    function _add(Set storage set, bytes32 value) private returns (bool) {
+        if (!_contains(set, value)) {
+            set._values.push(value);
+            // The value is stored at length-1, but we add 1 to all indexes
+            // and use 0 as a sentinel value
+            set._indexes[value] = set._values.length;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * @dev Removes a value from a set. O(1).
+     *
+     * Returns true if the value was removed from the set, that is if it was
+     * present.
+     */
+    function _remove(Set storage set, bytes32 value) private returns (bool) {
+        // We read and store the value's index to prevent multiple reads from the same storage slot
+        uint256 valueIndex = set._indexes[value];
+
+        if (valueIndex != 0) { // Equivalent to contains(set, value)
+            // To delete an element from the _values array in O(1), we swap the element to delete with the last one in
+            // the array, and then remove the last element (sometimes called as 'swap and pop').
+            // This modifies the order of the array, as noted in {at}.
+
+            uint256 toDeleteIndex = valueIndex - 1;
+            uint256 lastIndex = set._values.length - 1;
+
+            // When the value to delete is the last one, the swap operation is unnecessary. However, since this occurs
+            // so rarely, we still do the swap anyway to avoid the gas cost of adding an 'if' statement.
+
+            bytes32 lastvalue = set._values[lastIndex];
+
+            // Move the last value to the index where the value to delete is
+            set._values[toDeleteIndex] = lastvalue;
+            // Update the index for the moved value
+            set._indexes[lastvalue] = toDeleteIndex + 1; // All indexes are 1-based
+
+            // Delete the slot where the moved value was stored
+            set._values.pop();
+
+            // Delete the index for the deleted slot
+            delete set._indexes[value];
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * @dev Returns true if the value is in the set. O(1).
+     */
+    function _contains(Set storage set, bytes32 value) private view returns (bool) {
+        return set._indexes[value] != 0;
+    }
+
+    /**
+     * @dev Returns the number of values on the set. O(1).
+     */
+    function _length(Set storage set) private view returns (uint256) {
+        return set._values.length;
+    }
+
+   /**
+    * @dev Returns the value stored at position `index` in the set. O(1).
+    *
+    * Note that there are no guarantees on the ordering of values inside the
+    * array, and it may change when more values are added or removed.
+    *
+    * Requirements:
+    *
+    * - `index` must be strictly less than {length}.
+    */
+    function _at(Set storage set, uint256 index) private view returns (bytes32) {
+        require(set._values.length > index, "EnumerableSet: index out of bounds");
+        return set._values[index];
+    }
+
+    // AddressSet
+
+    struct AddressSet {
+        Set _inner;
+    }
+
+    /**
+     * @dev Add a value to a set. O(1).
+     *
+     * Returns true if the value was added to the set, that is if it was not
+     * already present.
+     */
+    function add(AddressSet storage set, address value) internal returns (bool) {
+        return _add(set._inner, bytes32(uint256(value)));
+    }
+
+    /**
+     * @dev Removes a value from a set. O(1).
+     *
+     * Returns true if the value was removed from the set, that is if it was
+     * present.
+     */
+    function remove(AddressSet storage set, address value) internal returns (bool) {
+        return _remove(set._inner, bytes32(uint256(value)));
+    }
+
+    /**
+     * @dev Returns true if the value is in the set. O(1).
+     */
+    function contains(AddressSet storage set, address value) internal view returns (bool) {
+        return _contains(set._inner, bytes32(uint256(value)));
+    }
+
+    /**
+     * @dev Returns the number of values in the set. O(1).
+     */
+    function length(AddressSet storage set) internal view returns (uint256) {
+        return _length(set._inner);
+    }
+
+   /**
+    * @dev Returns the value stored at position `index` in the set. O(1).
+    *
+    * Note that there are no guarantees on the ordering of values inside the
+    * array, and it may change when more values are added or removed.
+    *
+    * Requirements:
+    *
+    * - `index` must be strictly less than {length}.
+    */
+    function at(AddressSet storage set, uint256 index) internal view returns (address) {
+        return address(uint256(_at(set._inner, index)));
+    }
+
+
+    // UintSet
+
+    struct UintSet {
+        Set _inner;
+    }
+
+    /**
+     * @dev Add a value to a set. O(1).
+     *
+     * Returns true if the value was added to the set, that is if it was not
+     * already present.
+     */
+    function add(UintSet storage set, uint256 value) internal returns (bool) {
+        return _add(set._inner, bytes32(value));
+    }
+
+    /**
+     * @dev Removes a value from a set. O(1).
+     *
+     * Returns true if the value was removed from the set, that is if it was
+     * present.
+     */
+    function remove(UintSet storage set, uint256 value) internal returns (bool) {
+        return _remove(set._inner, bytes32(value));
+    }
+
+    /**
+     * @dev Returns true if the value is in the set. O(1).
+     */
+    function contains(UintSet storage set, uint256 value) internal view returns (bool) {
+        return _contains(set._inner, bytes32(value));
+    }
+
+    /**
+     * @dev Returns the number of values on the set. O(1).
+     */
+    function length(UintSet storage set) internal view returns (uint256) {
+        return _length(set._inner);
+    }
+
+   /**
+    * @dev Returns the value stored at position `index` in the set. O(1).
+    *
+    * Note that there are no guarantees on the ordering of values inside the
+    * array, and it may change when more values are added or removed.
+    *
+    * Requirements:
+    *
+    * - `index` must be strictly less than {length}.
+    */
+    function at(UintSet storage set, uint256 index) internal view returns (uint256) {
+        return uint256(_at(set._inner, index));
+    }
+}
+
+// File: @openzeppelin/contracts/access/AccessControl.sol
+
+pragma solidity ^0.6.0;
+
+
+
+
+/**
+ * @dev Contract module that allows children to implement role-based access
+ * control mechanisms.
+ *
+ * Roles are referred to by their `bytes32` identifier. These should be exposed
+ * in the external API and be unique. The best way to achieve this is by
+ * using `public constant` hash digests:
+ *
+ * ```
+ * bytes32 public constant MY_ROLE = keccak256("MY_ROLE");
+ * ```
+ *
+ * Roles can be used to represent a set of permissions. To restrict access to a
+ * function call, use {hasRole}:
+ *
+ * ```
+ * function foo() public {
+ *     require(hasRole(MY_ROLE, _msgSender()));
+ *     ...
+ * }
+ * ```
+ *
+ * Roles can be granted and revoked dynamically via the {grantRole} and
+ * {revokeRole} functions. Each role has an associated admin role, and only
+ * accounts that have a role's admin role can call {grantRole} and {revokeRole}.
+ *
+ * By default, the admin role for all roles is `DEFAULT_ADMIN_ROLE`, which means
+ * that only accounts with this role will be able to grant or revoke other
+ * roles. More complex role relationships can be created by using
+ * {_setRoleAdmin}.
+ */
+abstract contract AccessControl is Context {
+    using EnumerableSet for EnumerableSet.AddressSet;
+    using Address for address;
+
+    struct RoleData {
+        EnumerableSet.AddressSet members;
+        bytes32 adminRole;
+    }
+
+    mapping (bytes32 => RoleData) private _roles;
+
+    bytes32 public constant DEFAULT_ADMIN_ROLE = 0x00;
+
+    /**
+     * @dev Emitted when `account` is granted `role`.
+     *
+     * `sender` is the account that originated the contract call, an admin role
+     * bearer except when using {_setupRole}.
+     */
+    event RoleGranted(bytes32 indexed role, address indexed account, address indexed sender);
+
+    /**
+     * @dev Emitted when `account` is revoked `role`.
+     *
+     * `sender` is the account that originated the contract call:
+     *   - if using `revokeRole`, it is the admin role bearer
+     *   - if using `renounceRole`, it is the role bearer (i.e. `account`)
+     */
+    event RoleRevoked(bytes32 indexed role, address indexed account, address indexed sender);
+
+    /**
+     * @dev Returns `true` if `account` has been granted `role`.
+     */
+    function hasRole(bytes32 role, address account) public view returns (bool) {
+        return _roles[role].members.contains(account);
+    }
+
+    /**
+     * @dev Returns the number of accounts that have `role`. Can be used
+     * together with {getRoleMember} to enumerate all bearers of a role.
+     */
+    function getRoleMemberCount(bytes32 role) public view returns (uint256) {
+        return _roles[role].members.length();
+    }
+
+    /**
+     * @dev Returns one of the accounts that have `role`. `index` must be a
+     * value between 0 and {getRoleMemberCount}, non-inclusive.
+     *
+     * Role bearers are not sorted in any particular way, and their ordering may
+     * change at any point.
+     *
+     * WARNING: When using {getRoleMember} and {getRoleMemberCount}, make sure
+     * you perform all queries on the same block. See the following
+     * https://forum.openzeppelin.com/t/iterating-over-elements-on-enumerableset-in-openzeppelin-contracts/2296[forum post]
+     * for more information.
+     */
+    function getRoleMember(bytes32 role, uint256 index) public view returns (address) {
+        return _roles[role].members.at(index);
+    }
+
+    /**
+     * @dev Returns the admin role that controls `role`. See {grantRole} and
+     * {revokeRole}.
+     *
+     * To change a role's admin, use {_setRoleAdmin}.
+     */
+    function getRoleAdmin(bytes32 role) public view returns (bytes32) {
+        return _roles[role].adminRole;
+    }
+
+    /**
+     * @dev Grants `role` to `account`.
+     *
+     * If `account` had not been already granted `role`, emits a {RoleGranted}
+     * event.
+     *
+     * Requirements:
+     *
+     * - the caller must have ``role``'s admin role.
+     */
+    function grantRole(bytes32 role, address account) public virtual {
+        require(hasRole(_roles[role].adminRole, _msgSender()), "AccessControl: sender must be an admin to grant");
+
+        _grantRole(role, account);
+    }
+
+    /**
+     * @dev Revokes `role` from `account`.
+     *
+     * If `account` had been granted `role`, emits a {RoleRevoked} event.
+     *
+     * Requirements:
+     *
+     * - the caller must have ``role``'s admin role.
+     */
+    function revokeRole(bytes32 role, address account) public virtual {
+        require(hasRole(_roles[role].adminRole, _msgSender()), "AccessControl: sender must be an admin to revoke");
+
+        _revokeRole(role, account);
+    }
+
+    /**
+     * @dev Revokes `role` from the calling account.
+     *
+     * Roles are often managed via {grantRole} and {revokeRole}: this function's
+     * purpose is to provide a mechanism for accounts to lose their privileges
+     * if they are compromised (such as when a trusted device is misplaced).
+     *
+     * If the calling account had been granted `role`, emits a {RoleRevoked}
+     * event.
+     *
+     * Requirements:
+     *
+     * - the caller must be `account`.
+     */
+    function renounceRole(bytes32 role, address account) public virtual {
+        require(account == _msgSender(), "AccessControl: can only renounce roles for self");
+
+        _revokeRole(role, account);
+    }
+
+    /**
+     * @dev Grants `role` to `account`.
+     *
+     * If `account` had not been already granted `role`, emits a {RoleGranted}
+     * event. Note that unlike {grantRole}, this function doesn't perform any
+     * checks on the calling account.
+     *
+     * [WARNING]
+     * ====
+     * This function should only be called from the constructor when setting
+     * up the initial roles for the system.
+     *
+     * Using this function in any other way is effectively circumventing the admin
+     * system imposed by {AccessControl}.
+     * ====
+     */
+    function _setupRole(bytes32 role, address account) internal virtual {
+        _grantRole(role, account);
+    }
+
+    /**
+     * @dev Sets `adminRole` as ``role``'s admin role.
+     */
+    function _setRoleAdmin(bytes32 role, bytes32 adminRole) internal virtual {
+        _roles[role].adminRole = adminRole;
+    }
+
+    function _grantRole(bytes32 role, address account) private {
+        if (_roles[role].members.add(account)) {
+            emit RoleGranted(role, account, _msgSender());
+        }
+    }
+
+    function _revokeRole(bytes32 role, address account) private {
+        if (_roles[role].members.remove(account)) {
+            emit RoleRevoked(role, account, _msgSender());
+        }
+    }
+}
+
+// File: contracts/access/Roles.sol
+
+pragma solidity ^0.6.6;
+
+
+contract Roles is AccessControl {
+
+    bytes32 public constant OPERATOR_ROLE = keccak256("OPERATOR");
+
+    modifier onlyOperator() {
+        require(hasRole(OPERATOR_ROLE, _msgSender()), "Roles: caller does not have the OPERATOR role");
+        _;
+    }
+
+    constructor () public {
+        _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
+        _setupRole(OPERATOR_ROLE, _msgSender());
+    }
+}
+
+// File: contracts/crowdsale/FriendlyCrowdsale.sol
+
+pragma solidity ^0.6.6;
+
+
+
+
+
+
+/**
+ * @title FriendlyCrowdsale
+ * @author Vittorio Minacori (https://github.com/vittominacori)
+ * @dev FriendlyCrowdsale is a base contract for managing a token crowdsale,
+ * allowing investors to purchase tokens with ether.
+ */
+contract FriendlyCrowdsale is Context, ReentrancyGuard, Roles {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
+    using EnumerableSet for EnumerableSet.AddressSet;
+    using Address for address;
 
     // The token being sold
     IERC20 private _token;
@@ -494,6 +952,39 @@ contract Crowdsale is Context, ReentrancyGuard {
     // Amount of wei raised
     uint256 private _weiRaised;
 
+    // Max amount of wei to be contributed
+    uint256 private _cap;
+
+    // Crowdsale opening time
+    uint256 private _openingTime;
+
+    // Crowdsale closing time
+    uint256 private _closingTime;
+
+    // Minimum amount of funds to be raised in weis
+    uint256 private _goal;
+
+    // If the Crowdsale is finalized or not
+    bool private _finalized;
+
+    // Address where fee are collected
+    address payable private _feeWallet;
+
+    // Per mille rate fee
+    uint256 private _feePerMille;
+
+    // List of addresses who contributed in crowdsales
+    EnumerableSet.AddressSet private _investors;
+
+    // Map of investors deposit
+    mapping(address => uint256) private _deposits;
+
+    // Crowdsale status list
+    enum State { Review, Active, Refunding, Closed, Expired, Rejected }
+
+    // Crowdsale current state
+    State private _state;
+
     /**
      * Event for token purchase logging
      * @param purchaser who paid for the tokens
@@ -503,22 +994,68 @@ contract Crowdsale is Context, ReentrancyGuard {
      */
     event TokensPurchased(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
 
+    event CrowdsaleFinalized();
+
+    event Enabled();
+    event Rejected();
+    event RefundsClosed();
+    event RefundsEnabled();
+    event Expired();
+    event Withdrawn(address indexed refundee, uint256 weiAmount);
+
     /**
+     * @param openingTime Crowdsale opening time
+     * @param closingTime Crowdsale closing time
+     * @param cap Max amount of wei to be contributed
+     * @param goal Funding goal
      * @param rate Number of token units a buyer gets per wei
-     * @dev The rate is the conversion between wei and the smallest and indivisible
-     * token unit. So, if you are using a rate of 1 with a ERC20Detailed token
-     * with 3 decimals called TOK, 1 wei will give you 1 unit, or 0.001 TOK.
      * @param wallet Address where collected funds will be forwarded to
      * @param token Address of the token being sold
+     * @param feeWallet Address of the fee wallet
+     * @param feePerMille The per mille rate fee
      */
-    constructor (uint256 rate, address payable wallet, IERC20 token) public {
+    constructor(
+        uint256 openingTime,
+        uint256 closingTime,
+        uint256 cap,
+        uint256 goal,
+        uint256 rate,
+        address payable wallet,
+        IERC20 token,
+        address payable feeWallet,
+        uint256 feePerMille
+    ) public {
         require(rate > 0, "Crowdsale: rate is 0");
         require(wallet != address(0), "Crowdsale: wallet is the zero address");
         require(address(token) != address(0), "Crowdsale: token is the zero address");
 
+        require(cap > 0, "CappedCrowdsale: cap is 0");
+
+        // solhint-disable-next-line not-rely-on-time
+        require(openingTime >= block.timestamp, "TimedCrowdsale: opening time is before current time");
+        // solhint-disable-next-line max-line-length
+        require(closingTime > openingTime, "TimedCrowdsale: opening time is not before closing time");
+
+        require(goal > 0, "FriendlyCrowdsale: goal is 0");
+        require(goal <= cap, "FriendlyCrowdsale: goal is not less or equal cap");
+        require(feeWallet != address(0), "FriendlyCrowdsale: feeWallet is the zero address");
+
         _rate = rate;
         _wallet = wallet;
         _token = token;
+
+        _cap = cap;
+
+        _openingTime = openingTime;
+        _closingTime = closingTime;
+
+        _goal = goal;
+        _finalized = false;
+
+        _feeWallet = feeWallet;
+        _feePerMille = feePerMille;
+
+        _state = State.Review;
     }
 
     /**
@@ -527,36 +1064,173 @@ contract Crowdsale is Context, ReentrancyGuard {
      * of 2300, which is not enough to call buyTokens. Consider calling
      * buyTokens directly when purchasing tokens from a contract.
      */
-    function () external payable {
+    receive() external payable {
         buyTokens(_msgSender());
     }
 
     /**
      * @return the token being sold.
      */
-    function token() public view returns (IERC20) {
+    function token() external view returns (IERC20) {
         return _token;
     }
 
     /**
      * @return the address where funds are collected.
      */
-    function wallet() public view returns (address payable) {
+    function wallet() external view returns (address payable) {
         return _wallet;
     }
 
     /**
      * @return the number of token units a buyer gets per wei.
      */
-    function rate() public view returns (uint256) {
+    function rate() external view returns (uint256) {
         return _rate;
     }
 
     /**
      * @return the amount of wei raised.
      */
-    function weiRaised() public view returns (uint256) {
+    function weiRaised() external view returns (uint256) {
         return _weiRaised;
+    }
+
+    /**
+     * @return the cap of the crowdsale.
+     */
+    function cap() external view returns (uint256) {
+        return _cap;
+    }
+
+    /**
+     * @return the crowdsale opening time.
+     */
+    function openingTime() external view returns (uint256) {
+        return _openingTime;
+    }
+
+    /**
+     * @return the crowdsale closing time.
+     */
+    function closingTime() external view returns (uint256) {
+        return _closingTime;
+    }
+
+    /**
+     * @return true if the crowdsale is finalized, false otherwise.
+     */
+    function finalized() external view returns (bool) {
+        return _finalized;
+    }
+
+    /**
+     * @return address where fee are collected.
+     */
+    function feeWallet() external view returns (address payable) {
+        return _feeWallet;
+    }
+
+    /**
+     * @return the per mille rate fee.
+     */
+    function feePerMille() external view returns (uint256) {
+        return _feePerMille;
+    }
+
+    /**
+     * @return minimum amount of funds to be raised in wei.
+     */
+    function goal() external view returns (uint256) {
+        return _goal;
+    }
+
+    /**
+     * @return The current state of the escrow.
+     */
+    function state() external view returns (State) {
+        return _state;
+    }
+
+    /**
+     * @dev Checks whether the cap has been reached.
+     * @return Whether the cap was reached
+     */
+    function capReached() public view returns (bool) {
+        return _weiRaised >= _cap;
+    }
+
+    /**
+     * @dev Checks whether the period in which the crowdsale is open has already elapsed.
+     * @return Whether crowdsale period has elapsed
+     */
+    function hasClosed() public view returns (bool) {
+        // solhint-disable-next-line not-rely-on-time
+        return block.timestamp > _closingTime;
+    }
+
+    /**
+     * @return false if the ico is not started, true if the ico is started and running, true if the ico is completed
+     */
+    function started() public view returns (bool) {
+        return block.timestamp >= _openingTime; // solhint-disable-line not-rely-on-time
+    }
+
+    /**
+     * @return false if the ico is not started, false if the ico is started and running, true if the ico is completed
+     */
+    function ended() public view returns (bool) {
+        return hasClosed() || capReached();
+    }
+
+    /**
+     * @return true if the crowdsale is open, false otherwise.
+     */
+    function isOpen() public view returns (bool) {
+        return started() && !hasClosed();
+    }
+
+    /**
+     * @dev Checks whether funding goal was reached.
+     * @return Whether funding goal was reached
+     */
+    function goalReached() public view returns (bool) {
+        return _weiRaised >= _goal;
+    }
+
+    /**
+     * @dev Return the investors length.
+     * @return uint representing investors number
+     */
+    function investorsNumber() public view returns (uint) {
+        return _investors.length();
+    }
+
+    /**
+     * @dev Check if a investor exists.
+     * @param account The address to check
+     * @return bool
+     */
+    function investorExists(address account) public view returns (bool) {
+        return _investors.contains(account);
+    }
+
+    /**
+     * @dev Return the investors address by index.
+     * @param index A progressive index of investor addresses
+     * @return address of an investor by list index
+     */
+    function getInvestorAddress(uint index) public view returns (address) {
+        return _investors.at(index);
+    }
+
+    /**
+     * @dev get wei contribution for the given address
+     * @param account Address has contributed
+     * @return uint256
+     */
+    function weiContribution(address account) public view returns (uint256) {
+        return _deposits[account];
     }
 
     /**
@@ -585,18 +1259,85 @@ contract Crowdsale is Context, ReentrancyGuard {
     }
 
     /**
-     * @dev Validation of an incoming purchase. Use require statements to revert state when conditions are not met.
-     * Use `super` in contracts that inherit from Crowdsale to extend their validations.
-     * Example from CappedCrowdsale.sol's _preValidatePurchase method:
-     *     super._preValidatePurchase(beneficiary, weiAmount);
-     *     require(weiRaised().add(weiAmount) <= cap);
+     * @dev Enable the crowdsale
+     */
+    function enable() public onlyOperator {
+        require(_state == State.Review, "FriendlyCrowdsale: not reviewing");
+        _state = State.Active;
+
+        emit Enabled();
+    }
+
+    /**
+     * @dev Reject the crowdsale
+     */
+    function reject() public onlyOperator {
+        require(_state == State.Review, "FriendlyCrowdsale: not reviewing");
+        _state = State.Rejected;
+
+        _recoverRemainingTokens();
+
+        emit Rejected();
+    }
+
+    /**
+     * @dev Must be called after crowdsale ends, to do some extra finalization
+     * work. Calls the contract's finalization function.
+     */
+    function finalize() public {
+        require(!_finalized, "FinalizableCrowdsale: already finalized");
+        require(hasClosed(), "FinalizableCrowdsale: not closed");
+
+        _finalized = true;
+
+        _finalization();
+        emit CrowdsaleFinalized();
+    }
+
+    /**
+     * @dev Investors can claim refunds here if crowdsale is unsuccessful.
+     * @param refundee Whose refund will be claimed.
+     */
+    function claimRefund(address payable refundee) public {
+        require(_finalized, "FriendlyCrowdsale: not finalized");
+        require(_state == State.Refunding, "FriendlyCrowdsale: not refunding");
+        require(weiContribution(refundee) > 0, "FriendlyCrowdsale: no deposit");
+
+        uint256 payment = _deposits[refundee];
+
+        _deposits[refundee] = 0;
+
+        refundee.transfer(payment);
+
+        emit Withdrawn(refundee, payment);
+    }
+
+    /**
+     * @dev Set crowdsale expired and withdraw funds.
+     */
+    function setExpiredAndWithdraw() public onlyOperator {
+        // solhint-disable-next-line not-rely-on-time
+        require(block.timestamp >= _closingTime + 365 days, "FriendlyCrowdsale: not expired");
+        _state = State.Expired;
+
+        _feeWallet.transfer(address(this).balance);
+
+        emit Expired();
+    }
+
+    /**
+     * @dev Validation of an incoming purchase.
+     * Adds the validation that the crowdsale must be active.
      * @param beneficiary Address performing the token purchase
      * @param weiAmount Value in wei involved in the purchase
      */
     function _preValidatePurchase(address beneficiary, uint256 weiAmount) internal view {
         require(beneficiary != address(0), "Crowdsale: beneficiary is the zero address");
         require(weiAmount != 0, "Crowdsale: weiAmount is 0");
-        this; // silence state mutability warning without generating bytecode - see https://github.com/ethereum/solidity/issues/2691
+        require(_weiRaised.add(weiAmount) <= _cap, "CappedCrowdsale: cap exceeded");
+        require(isOpen(), "TimedCrowdsale: not open");
+
+        require(_state == State.Active, "FriendlyCrowdsale: not active");
     }
 
     /**
@@ -630,13 +1371,15 @@ contract Crowdsale is Context, ReentrancyGuard {
     }
 
     /**
-     * @dev Override for extensions that require an internal state to check for validity (current user contributions,
-     * etc.)
      * @param beneficiary Address receiving the tokens
      * @param weiAmount Value in wei involved in the purchase
      */
     function _updatePurchasingState(address beneficiary, uint256 weiAmount) internal {
-        // solhint-disable-previous-line no-empty-blocks
+        if (!investorExists(beneficiary)) {
+            _investors.add(beneficiary);
+        }
+
+        _deposits[beneficiary] = _deposits[beneficiary].add(weiAmount);
     }
 
     /**
@@ -646,525 +1389,6 @@ contract Crowdsale is Context, ReentrancyGuard {
      */
     function _getTokenAmount(uint256 weiAmount) internal view returns (uint256) {
         return weiAmount.mul(_rate);
-    }
-
-    /**
-     * @dev Determines how ETH is stored/forwarded on purchases.
-     */
-    function _forwardFunds() internal {
-        _wallet.transfer(msg.value);
-    }
-}
-
-// File: @openzeppelin/contracts/crowdsale/validation/TimedCrowdsale.sol
-
-/**
- * @title TimedCrowdsale
- * @dev Crowdsale accepting contributions only within a time frame.
- */
-contract TimedCrowdsale is Crowdsale {
-    using SafeMath for uint256;
-
-    uint256 private _openingTime;
-    uint256 private _closingTime;
-
-    /**
-     * Event for crowdsale extending
-     * @param newClosingTime new closing time
-     * @param prevClosingTime old closing time
-     */
-    event TimedCrowdsaleExtended(uint256 prevClosingTime, uint256 newClosingTime);
-
-    /**
-     * @dev Reverts if not in crowdsale time range.
-     */
-    modifier onlyWhileOpen {
-        require(isOpen(), "TimedCrowdsale: not open");
-        _;
-    }
-
-    /**
-     * @dev Constructor, takes crowdsale opening and closing times.
-     * @param openingTime Crowdsale opening time
-     * @param closingTime Crowdsale closing time
-     */
-    constructor (uint256 openingTime, uint256 closingTime) public {
-        // solhint-disable-next-line not-rely-on-time
-        require(openingTime >= block.timestamp, "TimedCrowdsale: opening time is before current time");
-        // solhint-disable-next-line max-line-length
-        require(closingTime > openingTime, "TimedCrowdsale: opening time is not before closing time");
-
-        _openingTime = openingTime;
-        _closingTime = closingTime;
-    }
-
-    /**
-     * @return the crowdsale opening time.
-     */
-    function openingTime() public view returns (uint256) {
-        return _openingTime;
-    }
-
-    /**
-     * @return the crowdsale closing time.
-     */
-    function closingTime() public view returns (uint256) {
-        return _closingTime;
-    }
-
-    /**
-     * @return true if the crowdsale is open, false otherwise.
-     */
-    function isOpen() public view returns (bool) {
-        // solhint-disable-next-line not-rely-on-time
-        return block.timestamp >= _openingTime && block.timestamp <= _closingTime;
-    }
-
-    /**
-     * @dev Checks whether the period in which the crowdsale is open has already elapsed.
-     * @return Whether crowdsale period has elapsed
-     */
-    function hasClosed() public view returns (bool) {
-        // solhint-disable-next-line not-rely-on-time
-        return block.timestamp > _closingTime;
-    }
-
-    /**
-     * @dev Extend parent behavior requiring to be within contributing period.
-     * @param beneficiary Token purchaser
-     * @param weiAmount Amount of wei contributed
-     */
-    function _preValidatePurchase(address beneficiary, uint256 weiAmount) internal onlyWhileOpen view {
-        super._preValidatePurchase(beneficiary, weiAmount);
-    }
-
-    /**
-     * @dev Extend crowdsale.
-     * @param newClosingTime Crowdsale closing time
-     */
-    function _extendTime(uint256 newClosingTime) internal {
-        require(!hasClosed(), "TimedCrowdsale: already closed");
-        // solhint-disable-next-line max-line-length
-        require(newClosingTime > _closingTime, "TimedCrowdsale: new closing time is before current closing time");
-
-        emit TimedCrowdsaleExtended(_closingTime, newClosingTime);
-        _closingTime = newClosingTime;
-    }
-}
-
-// File: @openzeppelin/contracts/crowdsale/distribution/FinalizableCrowdsale.sol
-
-/**
- * @title FinalizableCrowdsale
- * @dev Extension of TimedCrowdsale with a one-off finalization action, where one
- * can do extra work after finishing.
- */
-contract FinalizableCrowdsale is TimedCrowdsale {
-    using SafeMath for uint256;
-
-    bool private _finalized;
-
-    event CrowdsaleFinalized();
-
-    constructor () internal {
-        _finalized = false;
-    }
-
-    /**
-     * @return true if the crowdsale is finalized, false otherwise.
-     */
-    function finalized() public view returns (bool) {
-        return _finalized;
-    }
-
-    /**
-     * @dev Must be called after crowdsale ends, to do some extra finalization
-     * work. Calls the contract's finalization function.
-     */
-    function finalize() public {
-        require(!_finalized, "FinalizableCrowdsale: already finalized");
-        require(hasClosed(), "FinalizableCrowdsale: not closed");
-
-        _finalized = true;
-
-        _finalization();
-        emit CrowdsaleFinalized();
-    }
-
-    /**
-     * @dev Can be overridden to add finalization logic. The overriding function
-     * should call super._finalization() to ensure the chain of finalization is
-     * executed entirely.
-     */
-    function _finalization() internal {
-        // solhint-disable-previous-line no-empty-blocks
-    }
-}
-
-// File: @openzeppelin/contracts/crowdsale/validation/CappedCrowdsale.sol
-
-/**
- * @title CappedCrowdsale
- * @dev Crowdsale with a limit for total contributions.
- */
-contract CappedCrowdsale is Crowdsale {
-    using SafeMath for uint256;
-
-    uint256 private _cap;
-
-    /**
-     * @dev Constructor, takes maximum amount of wei accepted in the crowdsale.
-     * @param cap Max amount of wei to be contributed
-     */
-    constructor (uint256 cap) public {
-        require(cap > 0, "CappedCrowdsale: cap is 0");
-        _cap = cap;
-    }
-
-    /**
-     * @return the cap of the crowdsale.
-     */
-    function cap() public view returns (uint256) {
-        return _cap;
-    }
-
-    /**
-     * @dev Checks whether the cap has been reached.
-     * @return Whether the cap was reached
-     */
-    function capReached() public view returns (bool) {
-        return weiRaised() >= _cap;
-    }
-
-    /**
-     * @dev Extend parent behavior requiring purchase to respect the funding cap.
-     * @param beneficiary Token purchaser
-     * @param weiAmount Amount of wei contributed
-     */
-    function _preValidatePurchase(address beneficiary, uint256 weiAmount) internal view {
-        super._preValidatePurchase(beneficiary, weiAmount);
-        require(weiRaised().add(weiAmount) <= _cap, "CappedCrowdsale: cap exceeded");
-    }
-}
-
-// File: @openzeppelin/contracts/access/Roles.sol
-
-/**
- * @title Roles
- * @dev Library for managing addresses assigned to a Role.
- */
-library Roles {
-    struct Role {
-        mapping (address => bool) bearer;
-    }
-
-    /**
-     * @dev Give an account access to this role.
-     */
-    function add(Role storage role, address account) internal {
-        require(!has(role, account), "Roles: account already has role");
-        role.bearer[account] = true;
-    }
-
-    /**
-     * @dev Remove an account's access to this role.
-     */
-    function remove(Role storage role, address account) internal {
-        require(has(role, account), "Roles: account does not have role");
-        role.bearer[account] = false;
-    }
-
-    /**
-     * @dev Check if an account has this role.
-     * @return bool
-     */
-    function has(Role storage role, address account) internal view returns (bool) {
-        require(account != address(0), "Roles: account is the zero address");
-        return role.bearer[account];
-    }
-}
-
-// File: contracts/access/roles/OperatorRole.sol
-
-contract OperatorRole {
-    using Roles for Roles.Role;
-
-    event OperatorAdded(address indexed account);
-    event OperatorRemoved(address indexed account);
-
-    Roles.Role private _operators;
-
-    constructor() internal {
-        _addOperator(msg.sender);
-    }
-
-    modifier onlyOperator() {
-        require(isOperator(msg.sender), "OperatorRole: caller does not have the Operator role");
-        _;
-    }
-
-    function isOperator(address account) public view returns (bool) {
-        return _operators.has(account);
-    }
-
-    function addOperator(address account) public onlyOperator {
-        _addOperator(account);
-    }
-
-    function renounceOperator() public {
-        _removeOperator(msg.sender);
-    }
-
-    function _addOperator(address account) internal {
-        _operators.add(account);
-        emit OperatorAdded(account);
-    }
-
-    function _removeOperator(address account) internal {
-        _operators.remove(account);
-        emit OperatorRemoved(account);
-    }
-}
-
-// File: contracts/crowdsale/FriendlyCrowdsale.sol
-
-/**
- * @title FriendlyCrowdsale
- * @author Vittorio Minacori (https://github.com/vittominacori)
- * @dev FriendlyCrowdsale is a base contract for managing a token crowdsale,
- * allowing investors to purchase tokens with ether.
- */
-contract FriendlyCrowdsale is FinalizableCrowdsale, CappedCrowdsale, OperatorRole {
-    enum State { Review, Active, Refunding, Closed, Expired, Rejected }
-
-    struct Escrow {
-        bool exists;
-        uint256 deposit;
-    }
-
-    event Enabled();
-    event Rejected();
-    event RefundsClosed();
-    event RefundsEnabled();
-    event Expired();
-    event Withdrawn(address indexed refundee, uint256 weiAmount);
-
-    State private _state;
-
-    // address where fee are collected
-    address payable private _feeWallet;
-
-    // per mille rate fee
-    uint256 public _feePerMille;
-
-    // list of addresses who contributed in crowdsales
-    address[] private _investors;
-
-    // map of investors
-    mapping(address => Escrow) private _escrowList;
-
-    // minimum amount of funds to be raised in weis
-    uint256 private _goal;
-
-    /**
-     * @param openingTime Crowdsale opening time
-     * @param closingTime Crowdsale closing time
-     * @param cap Max amount of wei to be contributed
-     * @param goal Funding goal
-     * @param rate Number of token units a buyer gets per wei
-     * @param wallet Address where collected funds will be forwarded to
-     * @param token Address of the token being sold
-     * @param feeWallet Address of the fee wallet
-     * @param feePerMille The per mille rate fee
-     */
-    constructor(
-        uint256 openingTime,
-        uint256 closingTime,
-        uint256 cap,
-        uint256 goal,
-        uint256 rate,
-        address payable wallet,
-        IERC20 token,
-        address payable feeWallet,
-        uint256 feePerMille
-    )
-        public
-        Crowdsale(rate, wallet, token)
-        TimedCrowdsale(openingTime, closingTime)
-        CappedCrowdsale(cap)
-    {
-        require(goal > 0, "FriendlyCrowdsale: goal is 0");
-        require(goal <= cap, "FriendlyCrowdsale: goal is not less or equal cap");
-        require(feeWallet != address(0), "FriendlyCrowdsale: feeWallet is the zero address");
-
-        _goal = goal;
-        _feeWallet = feeWallet;
-        _feePerMille = feePerMille;
-
-        _state = State.Review;
-    }
-
-    /**
-     * @return address where fee are collected.
-     */
-    function feeWallet() public view returns (address payable) {
-        return _feeWallet;
-    }
-
-    /**
-     * @return the per mille rate fee.
-     */
-    function feePerMille() public view returns (uint256) {
-        return _feePerMille;
-    }
-
-    /**
-     * @return minimum amount of funds to be raised in wei.
-     */
-    function goal() public view returns (uint256) {
-        return _goal;
-    }
-
-    /**
-     * @return The current state of the escrow.
-     */
-    function state() public view returns (State) {
-        return _state;
-    }
-
-    /**
-     * @return false if the ico is not started, true if the ico is started and running, true if the ico is completed
-     */
-    function started() public view returns (bool) {
-        return block.timestamp >= openingTime(); // solhint-disable-line not-rely-on-time
-    }
-
-    /**
-     * @return false if the ico is not started, false if the ico is started and running, true if the ico is completed
-     */
-    function ended() public view returns (bool) {
-        return hasClosed() || capReached();
-    }
-
-    /**
-     * @dev Checks whether funding goal was reached.
-     * @return Whether funding goal was reached
-     */
-    function goalReached() public view returns (bool) {
-        return weiRaised() >= _goal;
-    }
-
-    /**
-     * @dev Return the investors length.
-     * @return uint representing investors number
-     */
-    function investorsNumber() public view returns (uint) {
-        return _investors.length;
-    }
-
-    /**
-     * @dev Check if a investor exists.
-     * @param account The address to check
-     * @return bool
-     */
-    function investorExists(address account) public view returns (bool) {
-        return _escrowList[account].exists;
-    }
-
-    /**
-     * @dev Return the investors address by index.
-     * @param index A progressive index of investor addresses
-     * @return address of an investor by list index
-     */
-    function getInvestorAddress(uint index) public view returns (address) {
-        return _investors[index];
-    }
-
-    /**
-     * @dev get wei contribution for the given address
-     * @param account Address has contributed
-     * @return uint256
-     */
-    function weiContribution(address account) public view returns (uint256) {
-        return _escrowList[account].deposit;
-    }
-
-    /**
-     * @dev Enable the crowdsale
-     */
-    function enable() public onlyOperator {
-        require(_state == State.Review, "FriendlyCrowdsale: not reviewing");
-        _state = State.Active;
-
-        emit Enabled();
-    }
-
-    /**
-     * @dev Reject the crowdsale
-     */
-    function reject() public onlyOperator {
-        require(_state == State.Review, "FriendlyCrowdsale: not reviewing");
-        _state = State.Rejected;
-
-        _recoverRemainingTokens();
-
-        emit Rejected();
-    }
-
-    /**
-     * @dev Investors can claim refunds here if crowdsale is unsuccessful.
-     * @param refundee Whose refund will be claimed.
-     */
-    function claimRefund(address payable refundee) public {
-        require(finalized(), "FriendlyCrowdsale: not finalized");
-        require(_state == State.Refunding, "FriendlyCrowdsale: not refunding");
-        require(weiContribution(refundee) > 0, "FriendlyCrowdsale: no deposit");
-
-        uint256 payment = _escrowList[refundee].deposit;
-
-        _escrowList[refundee].deposit = 0;
-
-        refundee.transfer(payment);
-
-        emit Withdrawn(refundee, payment);
-    }
-
-    /**
-     * @dev Set crowdsale expired and withdraw funds.
-     */
-    function setExpiredAndWithdraw() public onlyOperator {
-        // solhint-disable-next-line not-rely-on-time
-        require(block.timestamp >= closingTime() + 365 days, "FriendlyCrowdsale: not expired");
-        _state = State.Expired;
-
-        _feeWallet.transfer(address(this).balance);
-
-        emit Expired();
-    }
-
-    /**
-     * @dev Validation of an incoming purchase.
-     * Adds the validation that the crowdsale must be active.
-     * @param _beneficiary Address performing the token purchase
-     * @param _weiAmount Value in wei involved in the purchase
-     */
-    function _preValidatePurchase(address _beneficiary, uint256 _weiAmount) internal view {
-        require(_state == State.Active, "FriendlyCrowdsale: not active");
-
-        return super._preValidatePurchase(_beneficiary, _weiAmount);
-    }
-
-    /**
-     * @param beneficiary Address receiving the tokens
-     * @param weiAmount Value in wei involved in the purchase
-     */
-    function _updatePurchasingState(address beneficiary, uint256 weiAmount) internal {
-        if (!investorExists(beneficiary)) {
-            _investors.push(beneficiary);
-            _escrowList[beneficiary].exists = true;
-        }
-
-        _escrowList[beneficiary].deposit = _escrowList[beneficiary].deposit.add(weiAmount);
     }
 
     /**
@@ -1197,7 +1421,7 @@ contract FriendlyCrowdsale is FinalizableCrowdsale, CappedCrowdsale, OperatorRol
 
         _feeWallet.transfer(address(this).balance.mul(_feePerMille).div(1000));
 
-        wallet().transfer(address(this).balance);
+        _wallet.transfer(address(this).balance);
 
         emit RefundsClosed();
     }
@@ -1214,8 +1438,8 @@ contract FriendlyCrowdsale is FinalizableCrowdsale, CappedCrowdsale, OperatorRol
      * @dev Recover remaining tokens to wallet.
      */
     function _recoverRemainingTokens() internal {
-        if (token().balanceOf(address(this)) > 0) {
-            token().transfer(wallet(), token().balanceOf(address(this)));
+        if (_token.balanceOf(address(this)) > 0) {
+            _token.safeTransfer(_wallet, _token.balanceOf(address(this)));
         }
     }
 }
