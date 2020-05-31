@@ -62,6 +62,9 @@ contract FriendlyCrowdsale is Context, ReentrancyGuard, Roles {
     // Map of investors deposit
     mapping(address => uint256) private _deposits;
 
+    // Map of investors purchased tokens
+    mapping(address => uint256) private _purchasedTokens;
+
     // Crowdsale status list
     enum State { Review, Active, Refunding, Closed, Expired, Rejected }
 
@@ -317,6 +320,15 @@ contract FriendlyCrowdsale is Context, ReentrancyGuard, Roles {
     }
 
     /**
+     * @dev get purchased tokens for the given address
+     * @param account Address has contributed
+     * @return uint256
+     */
+    function purchasedTokens(address account) public view returns (uint256) {
+        return _purchasedTokens[account];
+    }
+
+    /**
      * @dev low level token purchase ***DO NOT OVERRIDE***
      * This function has a non-reentrancy guard, so it shouldn't be called by
      * another `nonReentrant` function.
@@ -335,7 +347,7 @@ contract FriendlyCrowdsale is Context, ReentrancyGuard, Roles {
         _processPurchase(beneficiary, tokens);
         emit TokensPurchased(_msgSender(), beneficiary, weiAmount, tokens);
 
-        _updatePurchasingState(beneficiary, weiAmount);
+        _updatePurchasingState(beneficiary, weiAmount, tokens);
 
         _forwardFunds();
         _postValidatePurchase(beneficiary, weiAmount);
@@ -456,13 +468,15 @@ contract FriendlyCrowdsale is Context, ReentrancyGuard, Roles {
     /**
      * @param beneficiary Address receiving the tokens
      * @param weiAmount Value in wei involved in the purchase
+     * @param tokenAmount Number of tokens to be purchased
      */
-    function _updatePurchasingState(address beneficiary, uint256 weiAmount) internal {
+    function _updatePurchasingState(address beneficiary, uint256 weiAmount, uint256 tokenAmount) internal {
         if (!investorExists(beneficiary)) {
             _investors.add(beneficiary);
         }
 
         _deposits[beneficiary] = _deposits[beneficiary].add(weiAmount);
+        _purchasedTokens[beneficiary] = _purchasedTokens[beneficiary].add(tokenAmount);
     }
 
     /**

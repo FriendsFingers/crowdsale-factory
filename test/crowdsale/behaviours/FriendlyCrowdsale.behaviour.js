@@ -48,6 +48,8 @@ function shouldBehaveLikeFriendlyCrowdsale ([owner, wallet, investor, purchaser,
     beforeEach(async function () {
       this.preWalletBalance = await balance.current(wallet);
       this.preFeeWalletBalance = await balance.current(feeWallet);
+
+      this.expectedTokenAmount = value.mul(await this.crowdsale.rate());
     });
 
     it('investor does not exist', async function () {
@@ -204,6 +206,14 @@ function shouldBehaveLikeFriendlyCrowdsale ([owner, wallet, investor, purchaser,
             expect(await this.crowdsale.weiContribution(investor)).to.be.bignumber.equal(value);
           });
 
+          it('should increase purchased tokens', async function () {
+            await this.crowdsale.sendTransaction({ value, from: purchaser });
+            await this.crowdsale.sendTransaction({ value, from: investor });
+
+            expect(await this.crowdsale.purchasedTokens(purchaser)).to.be.bignumber.equal(this.expectedTokenAmount);
+            expect(await this.crowdsale.purchasedTokens(investor)).to.be.bignumber.equal(this.expectedTokenAmount);
+          });
+
           it('should increase escrow deposit', async function () {
             const balanceTracker = await balance.tracker(this.crowdsale.address);
             await this.crowdsale.sendTransaction({ value, from: investor });
@@ -246,6 +256,14 @@ function shouldBehaveLikeFriendlyCrowdsale ([owner, wallet, investor, purchaser,
 
             expect(await this.crowdsale.weiContribution(purchaser)).to.be.bignumber.equal(value);
             expect(await this.crowdsale.weiContribution(investor)).to.be.bignumber.equal(value);
+          });
+
+          it('should increase purchased tokens', async function () {
+            await this.crowdsale.buyTokens(purchaser, { value, from: purchaser });
+            await this.crowdsale.buyTokens(investor, { value, from: purchaser });
+
+            expect(await this.crowdsale.purchasedTokens(purchaser)).to.be.bignumber.equal(this.expectedTokenAmount);
+            expect(await this.crowdsale.purchasedTokens(investor)).to.be.bignumber.equal(this.expectedTokenAmount);
           });
 
           it('should increase escrow deposit', async function () {
