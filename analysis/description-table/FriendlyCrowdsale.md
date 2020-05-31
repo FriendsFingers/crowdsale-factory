@@ -5,7 +5,7 @@
 
 |  File Name  |  SHA-1 Hash  |
 |-------------|--------------|
-| dist/FriendlyCrowdsale.dist.sol | be08496dd1b2480ef9b077c4e71def19910c6a1a |
+| dist/FriendlyCrowdsale.dist.sol | f49e0400a9415f7274295ceddefb4b7f99982292 |
 
 
 ### Contracts Description Table
@@ -111,6 +111,7 @@
 | └ | investorExists | Public ❗️ |   |NO❗️ |
 | └ | getInvestorAddress | Public ❗️ |   |NO❗️ |
 | └ | weiContribution | Public ❗️ |   |NO❗️ |
+| └ | purchasedTokens | Public ❗️ |   |NO❗️ |
 | └ | buyTokens | Public ❗️ |  💵 | nonReentrant |
 | └ | enable | Public ❗️ | 🛑  | onlyOperator |
 | └ | reject | Public ❗️ | 🛑  | onlyOperator |
