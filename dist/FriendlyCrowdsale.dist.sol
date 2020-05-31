@@ -720,7 +720,7 @@ pragma solidity ^0.6.0;
  *
  * ```
  * function foo() public {
- *     require(hasRole(MY_ROLE, _msgSender()));
+ *     require(hasRole(MY_ROLE, msg.sender));
  *     ...
  * }
  * ```
@@ -733,6 +733,10 @@ pragma solidity ^0.6.0;
  * that only accounts with this role will be able to grant or revoke other
  * roles. More complex role relationships can be created by using
  * {_setRoleAdmin}.
+ *
+ * WARNING: The `DEFAULT_ADMIN_ROLE` is also its own admin: it has permission to
+ * grant and revoke this role. Extra precautions should be taken to secure
+ * accounts that have been granted it.
  */
 abstract contract AccessControl is Context {
     using EnumerableSet for EnumerableSet.AddressSet;
@@ -898,7 +902,9 @@ abstract contract AccessControl is Context {
 
 // File: contracts/access/Roles.sol
 
-pragma solidity ^0.6.6;
+// SPDX-License-Identifier: MIT
+
+pragma solidity ^0.6.8;
 
 
 contract Roles is AccessControl {
@@ -918,7 +924,9 @@ contract Roles is AccessControl {
 
 // File: contracts/crowdsale/FriendlyCrowdsale.sol
 
-pragma solidity ^0.6.6;
+// SPDX-License-Identifier: MIT
+
+pragma solidity ^0.6.8;
 
 
 
