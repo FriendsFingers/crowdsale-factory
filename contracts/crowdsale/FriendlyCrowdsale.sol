@@ -115,33 +115,32 @@ contract FriendlyCrowdsale is Context, ReentrancyGuard, Roles {
         require(wallet != address(0), "Crowdsale: wallet is the zero address");
         require(address(token) != address(0), "Crowdsale: token is the zero address");
 
-        require(cap > 0, "CappedCrowdsale: cap is 0");
-
         // solhint-disable-next-line not-rely-on-time
         require(openingTime >= block.timestamp, "TimedCrowdsale: opening time is before current time");
-        // solhint-disable-next-line max-line-length
         require(closingTime > openingTime, "TimedCrowdsale: opening time is not before closing time");
+        require(closingTime <= openingTime + 40 days, "FriendlyCrowdsale: max allowed duration is 40 days");
 
+        require(cap > 0, "CappedCrowdsale: cap is 0");
         require(goal > 0, "FriendlyCrowdsale: goal is 0");
         require(goal <= cap, "FriendlyCrowdsale: goal is not less or equal cap");
+
         require(feeWallet != address(0), "FriendlyCrowdsale: feeWallet is the zero address");
 
         _rate = rate;
         _wallet = wallet;
         _token = token;
 
-        _cap = cap;
-
         _openingTime = openingTime;
         _closingTime = closingTime;
 
+        _cap = cap;
         _goal = goal;
-        _finalized = false;
 
         _feeWallet = feeWallet;
         _feePerMille = feePerMille;
 
         _state = State.Review;
+        _finalized = false;
     }
 
     /**

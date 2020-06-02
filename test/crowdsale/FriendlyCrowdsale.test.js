@@ -14,7 +14,7 @@ contract('FriendlyCrowdsale', function ([owner, wallet, investor, purchaser, fee
 
   beforeEach(async function () {
     this.openingTime = (await time.latest()).add(time.duration.weeks(1));
-    this.closingTime = this.openingTime.add(time.duration.weeks(1));
+    this.closingTime = this.openingTime.add(time.duration.days(40));
     this.afterClosingTime = this.closingTime.add(time.duration.seconds(1));
 
     this.cap = ether('3');
@@ -158,6 +158,23 @@ contract('FriendlyCrowdsale', function ([owner, wallet, investor, purchaser, fee
           this.feePerMille,
         ),
         'TimedCrowdsale: opening time is not before closing time',
+      );
+    });
+
+    it('requires crowdsale is not more than 40 days long', async function () {
+      await expectRevert(
+        FriendlyCrowdsale.new(
+          this.openingTime,
+          this.closingTime.add(time.duration.seconds(1)),
+          this.cap,
+          this.goal,
+          this.rate,
+          wallet,
+          this.token.address,
+          feeWallet,
+          this.feePerMille,
+        ),
+        'FriendlyCrowdsale: max allowed duration is 40 days',
       );
     });
 
