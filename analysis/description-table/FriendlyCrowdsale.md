@@ -5,7 +5,7 @@
 
 |  File Name  |  SHA-1 Hash  |
 |-------------|--------------|
-| dist/FriendlyCrowdsale.dist.sol | 31864cd3baaa38cf8321d1085cb55780682e707c |
+| dist/FriendlyCrowdsale.dist.sol | 09f8e5c0c64fd8949ca9bee8415cf028515078bd |
 
 
 ### Contracts Description Table

@@ -1,6 +1,8 @@
 
 // File: @openzeppelin/contracts/math/SafeMath.sol
 
+// SPDX-License-Identifier: MIT
+
 pragma solidity ^0.6.0;
 
 /**
@@ -154,6 +156,8 @@ library SafeMath {
 
 // File: @openzeppelin/contracts/token/ERC20/IERC20.sol
 
+// SPDX-License-Identifier: MIT
+
 pragma solidity ^0.6.0;
 
 /**
@@ -232,6 +236,8 @@ interface IERC20 {
 
 // File: @openzeppelin/contracts/utils/Address.sol
 
+// SPDX-License-Identifier: MIT
+
 pragma solidity ^0.6.2;
 
 /**
@@ -292,6 +298,8 @@ library Address {
 }
 
 // File: @openzeppelin/contracts/token/ERC20/SafeERC20.sol
+
+// SPDX-License-Identifier: MIT
 
 pragma solidity ^0.6.0;
 
@@ -370,6 +378,8 @@ library SafeERC20 {
 
 // File: @openzeppelin/contracts/GSN/Context.sol
 
+// SPDX-License-Identifier: MIT
+
 pragma solidity ^0.6.0;
 
 /*
@@ -398,6 +408,8 @@ contract Context {
 }
 
 // File: @openzeppelin/contracts/utils/ReentrancyGuard.sol
+
+// SPDX-License-Identifier: MIT
 
 pragma solidity ^0.6.0;
 
@@ -453,6 +465,8 @@ contract ReentrancyGuard {
 }
 
 // File: @openzeppelin/contracts/utils/EnumerableSet.sol
+
+// SPDX-License-Identifier: MIT
 
 pragma solidity ^0.6.0;
 
@@ -698,6 +712,8 @@ library EnumerableSet {
 
 // File: @openzeppelin/contracts/access/AccessControl.sol
 
+// SPDX-License-Identifier: MIT
+
 pragma solidity ^0.6.0;
 
 
@@ -904,7 +920,7 @@ abstract contract AccessControl is Context {
 
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.6.8;
+pragma solidity ^0.6.10;
 
 
 contract Roles is AccessControl {
@@ -926,7 +942,7 @@ contract Roles is AccessControl {
 
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.6.8;
+pragma solidity ^0.6.10;
 
 
 
