@@ -5,7 +5,7 @@
 
 |  File Name  |  SHA-1 Hash  |
 |-------------|--------------|
-| dist/FriendlyCrowdsale.dist.sol | 09f8e5c0c64fd8949ca9bee8415cf028515078bd |
+| dist/FriendlyCrowdsale.dist.sol | c3650700e135a69f3fb448c999260ceff7e62eab |
 
 
 ### Contracts Description Table
@@ -36,6 +36,11 @@
 | **Address** | Library |  |||
 | └ | isContract | Internal 🔒 |   | |
 | └ | sendValue | Internal 🔒 | 🛑  | |
+| └ | functionCall | Internal 🔒 | 🛑  | |
+| └ | functionCall | Internal 🔒 | 🛑  | |
+| └ | functionCallWithValue | Internal 🔒 | 🛑  | |
+| └ | functionCallWithValue | Internal 🔒 | 🛑  | |
+| └ | _functionCallWithValue | Private 🔐 | 🛑  | |
 ||||||
 | **SafeERC20** | Library |  |||
 | └ | safeTransfer | Internal 🔒 | 🛑  | |
@@ -46,7 +51,6 @@
 | └ | _callOptionalReturn | Private 🔐 | 🛑  | |
 ||||||
 | **Context** | Implementation |  |||
-| └ | <Constructor> | Internal 🔒 | 🛑  | |
 | └ | _msgSender | Internal 🔒 |   | |
 | └ | _msgData | Internal 🔒 |   | |
 ||||||
