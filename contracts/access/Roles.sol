@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.6.10;
+pragma solidity ^0.7.1;
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
@@ -13,7 +13,7 @@ contract Roles is AccessControl {
         _;
     }
 
-    constructor () public {
+    constructor () {
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
         _setupRole(OPERATOR_ROLE, _msgSender());
     }

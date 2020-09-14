@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.6.10;
+pragma solidity ^0.7.1;
 
 import "eth-token-recover/contracts/TokenRecover.sol";
 import "./FriendlyCrowdsale.sol";
@@ -24,7 +24,7 @@ contract CrowdsaleFactory is Roles, TokenRecover {
      * @param feeWallet Address of the fee wallet
      * @param feePerMille The per mille rate fee
      */
-    constructor(address payable feeWallet, uint256 feePerMille) public {
+    constructor(address payable feeWallet, uint256 feePerMille) {
         require(feeWallet != address(0), "CrowdsaleFactory: feeWallet is the zero address");
 
         _feeWallet = feeWallet;

@@ -5,7 +5,7 @@
 
 |  File Name  |  SHA-1 Hash  |
 |-------------|--------------|
-| dist/FriendlyCrowdsale.dist.sol | c3650700e135a69f3fb448c999260ceff7e62eab |
+| dist/FriendlyCrowdsale.dist.sol | 1f4473a05cdcb425daa31b67eb3aae75d7dc4d9b |
 
 
 ### Contracts Description Table
@@ -55,7 +55,7 @@
 | └ | _msgData | Internal 🔒 |   | |
 ||||||
 | **ReentrancyGuard** | Implementation |  |||
-| └ | <Constructor> | Internal 🔒 | 🛑  | |
+| └ | <Constructor> | Public ❗️ | 🛑  |NO❗️ |
 ||||||
 | **EnumerableSet** | Library |  |||
 | └ | _add | Private 🔐 | 🛑  | |
