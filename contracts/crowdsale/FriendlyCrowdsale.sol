@@ -4,7 +4,6 @@ pragma solidity ^0.7.1;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
-import "@openzeppelin/contracts/GSN/Context.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "../access/Roles.sol";
 
@@ -14,7 +13,7 @@ import "../access/Roles.sol";
  * @dev FriendlyCrowdsale is a base contract for managing a token crowdsale,
  * allowing investors to purchase tokens with ether.
  */
-contract FriendlyCrowdsale is Context, ReentrancyGuard, Roles {
+contract FriendlyCrowdsale is ReentrancyGuard, Roles {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
     using EnumerableSet for EnumerableSet.AddressSet;
