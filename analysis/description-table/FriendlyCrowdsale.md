@@ -5,7 +5,7 @@
 
 |  File Name  |  SHA-1 Hash  |
 |-------------|--------------|
-| dist/FriendlyCrowdsale.dist.sol | 1f4473a05cdcb425daa31b67eb3aae75d7dc4d9b |
+| dist/FriendlyCrowdsale.dist.sol | be67d9cfa46667c113a4263bef7cb0d92102fe6b |
 
 
 ### Contracts Description Table
@@ -40,7 +40,9 @@
 | └ | functionCall | Internal 🔒 | 🛑  | |
 | └ | functionCallWithValue | Internal 🔒 | 🛑  | |
 | └ | functionCallWithValue | Internal 🔒 | 🛑  | |
-| └ | _functionCallWithValue | Private 🔐 | 🛑  | |
+| └ | functionStaticCall | Internal 🔒 |   | |
+| └ | functionStaticCall | Internal 🔒 |   | |
+| └ | _verifyCallResult | Private 🔐 |   | |
 ||||||
 | **SafeERC20** | Library |  |||
 | └ | safeTransfer | Internal 🔒 | 🛑  | |
@@ -49,10 +51,6 @@
 | └ | safeIncreaseAllowance | Internal 🔒 | 🛑  | |
 | └ | safeDecreaseAllowance | Internal 🔒 | 🛑  | |
 | └ | _callOptionalReturn | Private 🔐 | 🛑  | |
-||||||
-| **Context** | Implementation |  |||
-| └ | _msgSender | Internal 🔒 |   | |
-| └ | _msgData | Internal 🔒 |   | |
 ||||||
 | **ReentrancyGuard** | Implementation |  |||
 | └ | <Constructor> | Public ❗️ | 🛑  |NO❗️ |
@@ -73,6 +71,15 @@
 | └ | contains | Internal 🔒 |   | |
 | └ | length | Internal 🔒 |   | |
 | └ | at | Internal 🔒 |   | |
+| └ | add | Internal 🔒 | 🛑  | |
+| └ | remove | Internal 🔒 | 🛑  | |
+| └ | contains | Internal 🔒 |   | |
+| └ | length | Internal 🔒 |   | |
+| └ | at | Internal 🔒 |   | |
+||||||
+| **Context** | Implementation |  |||
+| └ | _msgSender | Internal 🔒 |   | |
+| └ | _msgData | Internal 🔒 |   | |
 ||||||
 | **AccessControl** | Implementation | Context |||
 | └ | hasRole | Public ❗️ |   |NO❗️ |
@@ -90,7 +97,7 @@
 | **Roles** | Implementation | AccessControl |||
 | └ | <Constructor> | Public ❗️ | 🛑  |NO❗️ |
 ||||||
-| **FriendlyCrowdsale** | Implementation | Context, ReentrancyGuard, Roles |||
+| **FriendlyCrowdsale** | Implementation | ReentrancyGuard, Roles |||
 | └ | <Constructor> | Public ❗️ | 🛑  |NO❗️ |
 | └ | <Receive Ether> | External ❗️ |  💵 |NO❗️ |
 | └ | token | External ❗️ |   |NO❗️ |

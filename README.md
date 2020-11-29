@@ -1,6 +1,6 @@
 # FriendsFingers' Crowdsale Factory
 
-[![Build Status](https://travis-ci.org/FriendsFingers/crowdsale-factory.svg?branch=master)](https://travis-ci.org/FriendsFingers/crowdsale-factory) 
+[![CI](https://github.com/FriendsFingers/crowdsale-factory/workflows/CI/badge.svg?branch=master)](https://github.com/FriendsFingers/crowdsale-factory/actions/)
 [![Coverage Status](https://coveralls.io/repos/github/FriendsFingers/crowdsale-factory/badge.svg)](https://coveralls.io/github/FriendsFingers/crowdsale-factory)
 [![MIT licensed](https://img.shields.io/github/license/FriendsFingers/crowdsale-factory.svg)](https://github.com/FriendsFingers/crowdsale-factory/blob/master/LICENSE)
 
@@ -21,45 +21,45 @@ npm install
 Open the Truffle console
 
 ```bash
-npm run console
+npm run truffle:console
 ```
 
 #### Compile
 
 ```bash
-npm run compile
+npm run truffle:compile
 ```
 
-#### Test 
+#### Test
 
 ```bash
-npm run test 
+npm run truffle:test
 ```
 
-### Usage (using Buidler)
+### Usage (using Hardhat)
 
-Open the Buidler console
+Open the Hardhat console
 
 ```bash
-npm run buidler:console
+npm run hardhat:console
 ```
 
 #### Compile
 
 ```bash
-npm run buidler:compile
+npm run hardhat:compile
 ```
 
-#### Test 
+#### Test
 
 ```bash
-npm run buidler:test 
+npm run hardhat:test
 ```
 
 ### Code Coverage
 
 ```bash
-npm run coverage
+npm run hardhat:coverage
 ```
 
 ## Linter
@@ -113,7 +113,7 @@ surya dependencies FriendlyCrowdsale dist/FriendlyCrowdsale.dist.sol
 ```
 ### Generate Report
 
-Edit `scripts/analyze.sh` to add your contracts 
+Edit `scripts/analyze.sh` to add your contracts
 
 ```bash
 npm run analyze

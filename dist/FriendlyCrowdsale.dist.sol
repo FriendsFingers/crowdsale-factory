@@ -268,14 +268,14 @@ library Address {
      * ====
      */
     function isContract(address account) internal view returns (bool) {
-        // According to EIP-1052, 0x0 is the value returned for not-yet created accounts
-        // and 0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470 is returned
-        // for accounts without code, i.e. `keccak256('')`
-        bytes32 codehash;
-        bytes32 accountHash = 0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470;
+        // This method relies on extcodesize, which returns 0 for contracts in
+        // construction, since the code is only stored at the end of the
+        // constructor execution.
+
+        uint256 size;
         // solhint-disable-next-line no-inline-assembly
-        assembly { codehash := extcodehash(account) }
-        return (codehash != accountHash && codehash != 0x0);
+        assembly { size := extcodesize(account) }
+        return size > 0;
     }
 
     /**
@@ -331,7 +331,7 @@ library Address {
      * _Available since v3.1._
      */
     function functionCall(address target, bytes memory data, string memory errorMessage) internal returns (bytes memory) {
-        return _functionCallWithValue(target, data, 0, errorMessage);
+        return functionCallWithValue(target, data, 0, errorMessage);
     }
 
     /**
@@ -357,14 +357,38 @@ library Address {
      */
     function functionCallWithValue(address target, bytes memory data, uint256 value, string memory errorMessage) internal returns (bytes memory) {
         require(address(this).balance >= value, "Address: insufficient balance for call");
-        return _functionCallWithValue(target, data, value, errorMessage);
-    }
-
-    function _functionCallWithValue(address target, bytes memory data, uint256 weiValue, string memory errorMessage) private returns (bytes memory) {
         require(isContract(target), "Address: call to non-contract");
 
         // solhint-disable-next-line avoid-low-level-calls
-        (bool success, bytes memory returndata) = target.call{ value: weiValue }(data);
+        (bool success, bytes memory returndata) = target.call{ value: value }(data);
+        return _verifyCallResult(success, returndata, errorMessage);
+    }
+
+    /**
+     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],
+     * but performing a static call.
+     *
+     * _Available since v3.3._
+     */
+    function functionStaticCall(address target, bytes memory data) internal view returns (bytes memory) {
+        return functionStaticCall(target, data, "Address: low-level static call failed");
+    }
+
+    /**
+     * @dev Same as {xref-Address-functionCall-address-bytes-string-}[`functionCall`],
+     * but performing a static call.
+     *
+     * _Available since v3.3._
+     */
+    function functionStaticCall(address target, bytes memory data, string memory errorMessage) internal view returns (bytes memory) {
+        require(isContract(target), "Address: static call to non-contract");
+
+        // solhint-disable-next-line avoid-low-level-calls
+        (bool success, bytes memory returndata) = target.staticcall(data);
+        return _verifyCallResult(success, returndata, errorMessage);
+    }
+
+    function _verifyCallResult(bool success, bytes memory returndata, string memory errorMessage) private pure returns(bytes memory) {
         if (success) {
             return returndata;
         } else {
@@ -461,33 +485,6 @@ library SafeERC20 {
     }
 }
 
-// File: @openzeppelin/contracts/GSN/Context.sol
-
-// SPDX-License-Identifier: MIT
-
-pragma solidity ^0.7.0;
-
-/*
- * @dev Provides information about the current execution context, including the
- * sender of the transaction and its data. While these are generally available
- * via msg.sender and msg.data, they should not be accessed in such a direct
- * manner, since when dealing with GSN meta-transactions the account sending and
- * paying for execution may not be the actual sender (as far as an application
- * is concerned).
- *
- * This contract is only required for intermediate, library-like contracts.
- */
-abstract contract Context {
-    function _msgSender() internal view virtual returns (address payable) {
-        return msg.sender;
-    }
-
-    function _msgData() internal view virtual returns (bytes memory) {
-        this; // silence state mutability warning without generating bytecode - see https://github.com/ethereum/solidity/issues/2691
-        return msg.data;
-    }
-}
-
 // File: @openzeppelin/contracts/utils/ReentrancyGuard.sol
 
 // SPDX-License-Identifier: MIT
@@ -510,7 +507,7 @@ pragma solidity ^0.7.0;
  * to protect against it, check out our blog post
  * https://blog.openzeppelin.com/reentrancy-after-istanbul/[Reentrancy After Istanbul].
  */
-contract ReentrancyGuard {
+abstract contract ReentrancyGuard {
     // Booleans are more expensive than uint256 or any type that takes up a full
     // word because each write operation emits an extra SLOAD to first read the
     // slot's contents, replace the bits taken up by the boolean, and then write
@@ -580,8 +577,8 @@ pragma solidity ^0.7.0;
  * }
  * ```
  *
- * As of v3.0.0, only sets of type `address` (`AddressSet`) and `uint256`
- * (`UintSet`) are supported.
+ * As of v3.3.0, sets of type `bytes32` (`Bytes32Set`), `address` (`AddressSet`)
+ * and `uint256` (`UintSet`) are supported.
  */
 library EnumerableSet {
     // To implement this library for multiple types with as little code
@@ -687,6 +684,60 @@ library EnumerableSet {
     function _at(Set storage set, uint256 index) private view returns (bytes32) {
         require(set._values.length > index, "EnumerableSet: index out of bounds");
         return set._values[index];
+    }
+
+    // Bytes32Set
+
+    struct Bytes32Set {
+        Set _inner;
+    }
+
+    /**
+     * @dev Add a value to a set. O(1).
+     *
+     * Returns true if the value was added to the set, that is if it was not
+     * already present.
+     */
+    function add(Bytes32Set storage set, bytes32 value) internal returns (bool) {
+        return _add(set._inner, value);
+    }
+
+    /**
+     * @dev Removes a value from a set. O(1).
+     *
+     * Returns true if the value was removed from the set, that is if it was
+     * present.
+     */
+    function remove(Bytes32Set storage set, bytes32 value) internal returns (bool) {
+        return _remove(set._inner, value);
+    }
+
+    /**
+     * @dev Returns true if the value is in the set. O(1).
+     */
+    function contains(Bytes32Set storage set, bytes32 value) internal view returns (bool) {
+        return _contains(set._inner, value);
+    }
+
+    /**
+     * @dev Returns the number of values in the set. O(1).
+     */
+    function length(Bytes32Set storage set) internal view returns (uint256) {
+        return _length(set._inner);
+    }
+
+   /**
+    * @dev Returns the value stored at position `index` in the set. O(1).
+    *
+    * Note that there are no guarantees on the ordering of values inside the
+    * array, and it may change when more values are added or removed.
+    *
+    * Requirements:
+    *
+    * - `index` must be strictly less than {length}.
+    */
+    function at(Bytes32Set storage set, uint256 index) internal view returns (bytes32) {
+        return _at(set._inner, index);
     }
 
     // AddressSet
@@ -796,6 +847,33 @@ library EnumerableSet {
     */
     function at(UintSet storage set, uint256 index) internal view returns (uint256) {
         return uint256(_at(set._inner, index));
+    }
+}
+
+// File: @openzeppelin/contracts/GSN/Context.sol
+
+// SPDX-License-Identifier: MIT
+
+pragma solidity ^0.7.0;
+
+/*
+ * @dev Provides information about the current execution context, including the
+ * sender of the transaction and its data. While these are generally available
+ * via msg.sender and msg.data, they should not be accessed in such a direct
+ * manner, since when dealing with GSN meta-transactions the account sending and
+ * paying for execution may not be the actual sender (as far as an application
+ * is concerned).
+ *
+ * This contract is only required for intermediate, library-like contracts.
+ */
+abstract contract Context {
+    function _msgSender() internal view virtual returns (address payable) {
+        return msg.sender;
+    }
+
+    function _msgData() internal view virtual returns (bytes memory) {
+        this; // silence state mutability warning without generating bytecode - see https://github.com/ethereum/solidity/issues/2691
+        return msg.data;
     }
 }
 
@@ -1022,7 +1100,7 @@ abstract contract AccessControl is Context {
 
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.7.1;
+pragma solidity ^0.7.0;
 
 
 contract Roles is AccessControl {
@@ -1044,8 +1122,7 @@ contract Roles is AccessControl {
 
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.7.1;
-
+pragma solidity ^0.7.0;
 
 
 
@@ -1057,7 +1134,7 @@ pragma solidity ^0.7.1;
  * @dev FriendlyCrowdsale is a base contract for managing a token crowdsale,
  * allowing investors to purchase tokens with ether.
  */
-contract FriendlyCrowdsale is Context, ReentrancyGuard, Roles {
+contract FriendlyCrowdsale is ReentrancyGuard, Roles {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
     using EnumerableSet for EnumerableSet.AddressSet;

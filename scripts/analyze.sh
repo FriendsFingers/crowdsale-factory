@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
-surya inheritance dist/FriendlyCrowdsale.dist.sol | dot -Tpng > analysis/inheritance-tree/FriendlyCrowdsale.png
+npx surya inheritance dist/FriendlyCrowdsale.dist.sol | dot -Tpng > analysis/inheritance-tree/FriendlyCrowdsale.png
 
-surya graph dist/FriendlyCrowdsale.dist.sol | dot -Tpng > analysis/control-flow/FriendlyCrowdsale.png
+npx surya graph dist/FriendlyCrowdsale.dist.sol | dot -Tpng > analysis/control-flow/FriendlyCrowdsale.png
 
-surya mdreport analysis/description-table/FriendlyCrowdsale.md dist/FriendlyCrowdsale.dist.sol
+npx surya mdreport analysis/description-table/FriendlyCrowdsale.md dist/FriendlyCrowdsale.dist.sol
 
-sol2uml dist/FriendlyCrowdsale.dist.sol -o analysis/uml/FriendlyCrowdsale.svg
+npx sol2uml dist/FriendlyCrowdsale.dist.sol -o analysis/uml/FriendlyCrowdsale.svg
